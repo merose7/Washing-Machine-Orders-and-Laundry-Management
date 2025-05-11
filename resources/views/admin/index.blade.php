@@ -6,8 +6,10 @@
     <a href="{{ route('machines.create') }}" class="btn btn-primary mb-3">Tambah Mesin Cuci</a>
 
     @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
-    @endif
+    <div id="alert" class="alert alert-success">
+        {{ session('success') }}
+    </div>
+@endif
 
     <table class="table">
         <thead>
@@ -41,5 +43,11 @@
             @endforeach
         </tbody>
     </table>
+    <div class="actions">
+    <a href="{{ route('admin.dashboard') }}" class="btn btn-primary">
+        Kembali ke Dashboard
+    </a>
+</div>
+
 </div>
 @endsection

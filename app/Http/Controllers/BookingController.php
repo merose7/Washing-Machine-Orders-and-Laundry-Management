@@ -12,6 +12,13 @@ class BookingController extends Controller
         return app(HomeController::class)->index();
     }
 
+    public function create(Request $request)
+    {
+        $machineId = $request->query('machine_id');
+        // You can pass the machine ID to the view if needed
+        return view('booking.create', compact('machineId'));
+    }
+
     public function processBooking(Request $request)
     {
         // Validasi dan proses booking

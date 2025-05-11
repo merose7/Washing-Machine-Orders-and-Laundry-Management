@@ -16,6 +16,7 @@
         <div class="mb-3">
             <label for="status">Status</label>
             <select name="status" class="form-control" required>
+                 <option value="" disabled selected>Pilih Status</option>
                 <option value="available" {{ (old('status', $machine->status ?? '') == 'available') ? 'selected' : '' }}>Tersedia</option>
                 <option value="booked" {{ (old('status', $machine->status ?? '') == 'booked') ? 'selected' : '' }}>Digunakan</option>
                 <option value="maintenance" {{ (old('status', $machine->status ?? '') == 'maintenance') ? 'selected' : '' }}>Perbaikan</option>

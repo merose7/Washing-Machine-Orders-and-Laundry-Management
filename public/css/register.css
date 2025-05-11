@@ -1,0 +1,142 @@
+/* General reset and body styling */
+body {
+    background-color: #f3f4f6;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #111827;
+}
+
+/* Container for form */
+.container {
+    max-width: 480px;
+    margin: 1 rem auto;
+    background: #ffffff53;
+    padding: 1.5rem 2.5rem;
+    border-radius: 0.75rem;
+}
+
+/* Logo styling */
+.logo-container img {
+    max-width: 100%; /* Membuat logo responsif */
+    height: auto; /* Menjaga proporsi logo */
+    max-height: 150px; /* Menentukan tinggi maksimal logo */
+}
+
+/* Heading style */
+h2 {
+    text-align: center;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 1.5rem;
+}
+
+/* Form styling */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 1 rem; /* Menurunkan jarak antar elemen form */
+}
+
+/* Label styling */
+label {
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.25rem;
+    display: block;
+}
+
+/* Input field styling */
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+    width: 100%;
+    padding: 0.625rem 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    color: #111827;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Focus state for inputs */
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+}
+
+/* Error message styling */
+.error-message {
+    color: #dc2626;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+/* Actions section styling */
+.actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+}
+
+/* Link inside actions section */
+.actions a {
+    color: #2563eb;
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+/* Link hover effect */
+.actions a:hover {
+    text-decoration: underline;
+}
+
+/* Button styling */
+button {
+    background-color: #2563eb;
+    color: white;
+    padding: 0.625rem 1.25rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+/* Button hover effect */
+button:hover {
+    background-color: #1d4ed8;
+}
+
+/* Responsive adjustments for mobile */
+@media (max-width: 640px) {
+    .container {
+        margin: 1rem;
+        padding: 1.5rem;
+    }
+
+    h2 {
+        font-size: 1.5rem;
+    }
+
+    button {
+        width: 100%;
+    }
+
+    .actions {
+        flex-direction: column;
+        gap: 0.75rem;
+        align-items: stretch;
+    }
+
+    .actions a {
+        text-align: center;
+    }
+}
