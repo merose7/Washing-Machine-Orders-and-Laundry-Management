@@ -21,13 +21,13 @@
         </div>
 
         <div class="mb-3">
-            <label for="time" class="form-label">Waktu Booking</label>
-            <input type="datetime-local" name="time" id="time" class="form-control" required>
+            <label for="booking_time" class="form-label">Waktu Booking</label>
+            <input type="datetime-local" name="booking_time" id="booking_time" class="form-control" required>
         </div>
 
         <div class="mb-3">
-            <label for="payment" class="form-label">Metode Pembayaran</label>
-            <select name="payment" id="payment" class="form-select" required>
+            <label for="payment_method" class="form-label">Metode Pembayaran</label>
+            <select name="payment_method" id="payment_method" class="form-select" required>
                 <option value="" disabled selected>Pilih metode pembayaran</option>
                 <option value="cash">Cash</option>
                 <option value="midtrans">Midtrans</option>
@@ -35,6 +35,11 @@
         </div>
 
         <button type="submit" class="btn btn-primary w-100">Booking Sekarang</button>
-    </form>
+        <div class="text-center mt-3">
+        <a href="{{ route('customer.dashboard') }}" class="btn btn-secondary">
+        Kembali
+        </a>
+        </div>
+
 </div>
 @endsection

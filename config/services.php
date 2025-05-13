@@ -30,5 +30,11 @@ return [
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
+    'midtrans' => [
+    'serverKey' => env('MIDTRANS_SERVER_KEY'),
+    'clientKey' => env('MIDTRANS_CLIENT_KEY'),
+    'isProduction' => false, // true untuk live mode
+],
+
 
 ];

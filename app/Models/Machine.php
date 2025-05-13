@@ -12,5 +12,7 @@ class Machine extends Model
     protected $fillable = [
         'name',
         'status',
+        'price',
+        'description',
     ];
 }

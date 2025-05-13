@@ -17,8 +17,12 @@ class DashboardAdminController extends Controller
         $totalPayments = Payment::count(); // asumsi ada model Payment
         $totalNotifications = Notification::count(); // asumsi ada model Notification
 
+        $recentBookings = Booking::orderBy('created_at', 'desc')->take(10)->get();
+        $recentNotifications = Notification::orderBy('created_at', 'desc')->take(10)->get();
+
         return view('admin.dashboard', compact(
-            'totalMachines', 'totalBookings', 'totalPayments', 'totalNotifications'
+            'totalMachines', 'totalBookings', 'totalPayments', 'totalNotifications',
+            'recentBookings', 'recentNotifications'
         ));
     }
 }
