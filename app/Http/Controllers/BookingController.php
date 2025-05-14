@@ -43,6 +43,8 @@ class BookingController extends Controller
             'payment_status' => 'pending',
             'status' => 'pending',
         ]);
+        $booking->payment_status = $request->payment_method === 'cash' ? 'pending' : 'pending';
+        $booking->save();
 
         // Update machine status to booked
         $machine = \App\Models\Machine::find($request->machine_id);
@@ -64,9 +66,9 @@ class BookingController extends Controller
 
 public function payment($id)
 {
-    $booking = Booking::findOrFail($id);
-    // Lanjutkan logika redirect ke Snap Midtrans di sini
-    return view('booking.midtrans', compact('booking'));
+    $booking = Booking::with('machine')->findOrFail($id);
+    $machinePrice = $booking->machine ? $booking->machine->price : null;
+    return view('booking.midtrans', compact('booking', 'machinePrice'));
 }
 
     public function paymentNotification(Request $request)
@@ -79,7 +81,9 @@ public function payment($id)
         $transactionStatus = $notification['transaction_status'] ?? null;
 
         if ($orderId && $transactionStatus) {
-            $booking = Booking::find($orderId);
+            // Remove 'BOOKING-' prefix to get booking ID
+            $bookingId = str_replace('BOOKING-', '', $orderId);
+            $booking = Booking::find($bookingId);
             if ($booking) {
                 if ($transactionStatus === 'capture' || $transactionStatus === 'settlement') {
                     $booking->payment_status = 'paid';
@@ -96,13 +100,16 @@ public function payment($id)
             }
         }
 
+        // Optionally, redirect to receipt page after payment notification
+        // But since this is a webhook, just return JSON response
         return response()->json(['status' => 'success']);
     }
 
     public function receipt($id)
     {
-        $booking = Booking::findOrFail($id);
-        return view('booking.receipt', compact('booking'));
+        $booking = Booking::with('machine')->findOrFail($id);
+        $machinePrice = $booking->machine ? $booking->machine->price : null;
+        return view('booking.receipt', compact('booking', 'machinePrice'));
     }
 
     public function getMidtransToken($id)

@@ -11,13 +11,20 @@ class PaymentController extends Controller
 {
     public function createSnapToken(Request $request)
     {
+        $bookingId = $request->input('booking_id');
+        $booking = \App\Models\Booking::find($bookingId);
+
+        if (!$booking) {
+            return response()->json(['error' => 'Booking not found'], 404);
+        }
+
         $params = [
             'transaction_details' => [
-                'order_id' => uniqid(),
-                'gross_amount' => 20000,
+                'order_id' => 'BOOKING-' . $booking->id,
+                'gross_amount' => 20000, // You can replace with actual amount if available
             ],
             'customer_details' => [
-                'first_name' => $request->name,
+                'first_name' => $booking->customer_name,
                 'email' => $request->email,
                 'phone' => $request->phone,
             ],

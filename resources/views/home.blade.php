@@ -97,7 +97,7 @@
 
   <!-- ***** Header Area End ***** -->
   </a>
-  <a href="https://wa.me/+6282110000000">
+  <a href="https://wa.me/+6281234567890">
   <button type="button" class="floating-btn1 btn btn-success" data-toggle="modal" data-target="#staticBackdrop">
     <image src="{{ asset('images/whatsapp.svg') }}" alt="Logo" style="height: 20px; width: 20;">
   </button>

@@ -13,7 +13,7 @@ return new class extends Migration
 {
     Schema::table('bookings', function (Blueprint $table) {
         $table->enum('payment_method', ['cash', 'midtrans'])->after('status');
-        $table->enum('payment_status', ['pending', 'paid'])->default('pending')->after('payment_method');
+        $table->enum('payment_status', ['Success','pending', 'paid'])->default('pending')->after('payment_method');
     });
 }
 

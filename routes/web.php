@@ -58,6 +58,12 @@ Route::middleware(['auth'])->group(function () {
 Route::post('/payment/token', [PaymentController::class, 'createSnapToken']);
 Route::get('/receipt/{id}', [BookingController::class, 'showReceipt'])->name('receipt.show');
 
+Route::middleware(['auth'])->group(function () {
+    Route::post('/booking', [BookingController::class, 'store'])->name('booking.store');
+    Route::get('/midtrans-payment/{id}', [BookingController::class, 'midtransPayment'])->name('booking.midtrans');
+    Route::get('/receipt/{id}', [BookingController::class, 'receipt'])->name('booking.receipt');
+});
+
 Route::get('/api/get-snap-token', function () {
     \Midtrans\Config::$serverKey = env('MIDTRANS_SERVER_KEY');
     \Midtrans\Config::$isProduction = env('MIDTRANS_IS_PRODUCTION', false);
