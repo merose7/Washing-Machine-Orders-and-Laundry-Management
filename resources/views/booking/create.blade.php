@@ -25,6 +25,22 @@
             <input type="datetime-local" name="booking_time" id="booking_time" class="form-control" required>
         </div>
 
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const now = new Date();
+
+        // Format jadi 'YYYY-MM-DDTHH:MM'
+        const pad = (n) => n.toString().padStart(2, '0');
+        const todayStr = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
+
+        const endOfDayStr = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}T23:59`;
+        
+        const bookingInput = document.getElementById('booking_time');
+        bookingInput.min = todayStr; // membatasi user untuk tidak bisa memilih waktu sebelum saat ini
+        bookingInput.max = endOfDayStr; //membatasi user untuk bisa booking sampai jam 23:59 hari ini
+    });
+</script>
+
         <div class="mb-3">
             <label for="payment_method" class="form-label">Metode Pembayaran</label>
             <select name="payment_method" id="payment_method" class="form-select" required>
@@ -34,7 +50,7 @@
             </select>
         </div>
 
-        <button type="submit" class="btn btn-primary w-100">Booking Sekarang</button>
+        <button type="submit" class="btn btn-danger w-100">Booking Sekarang</button>
         <div class="text-center mt-3">
         <a href="{{ route('customer.dashboard') }}" class="btn btn-secondary">
         Kembali

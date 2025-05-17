@@ -10,6 +10,6 @@ class Notification extends Model
     use HasFactory;
 
     protected $fillable = [
-        'title', 'message', 'is_read'
+        'title', 'message', 'is_read', 'payment_method'
     ];
 }

@@ -49,7 +49,7 @@ class BookingController extends Controller
         // Update machine status to booked
         $machine = \App\Models\Machine::find($request->machine_id);
         if ($machine) {
-            $machine->status = 'dibooking';
+            $machine->status = 'booked';
             $machine->save();
         }
 
@@ -150,6 +150,7 @@ public function payment($id)
                 'title' => 'Booking Notification',
                 'message' => $message,
                 'is_read' => false,
+                'payment_method' => $booking->payment_method,
             ]);
 
             // Send email notification

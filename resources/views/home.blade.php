@@ -143,7 +143,8 @@
       <div class="col-lg-8 text-center">
         <div class="section-heading">
           <h2 class="mb-3">Pilih Mesin Cuci Anda di <em>The Daily Wash Indonesia</em></h2>
-          <p class="text-muted">Booking mesin cuci dengan mudah dan cepat!</p>
+            <div class="line-dec"></div>
+            <p class="text-muted">Booking mesin cuci dengan mudah dan cepat!</p>
         </div>
       </div>
     </div>
@@ -161,11 +162,11 @@
                               @elseif($machine->status == 'booked')
                                   <span class="badge bg-warning text-dark">Dibooking</span>
                               @else
-                                  <span class="badge bg-danger">Maintenance</span>
+                                  <span class="badge bg-danger">Perbaikan</span>
                               @endif
                           </p>
                           @if($machine->status == 'available')
-                              <a href="{{ route('booking.create', ['machine_id' => $machine->id]) }}" class="btn btn-primary">Booking Sekarang</a>
+                          <a href="{{ route('booking.create', ['machine_id' => $machine->id]) }}" class="btn btn-danger">Booking Sekarang</a>
                           @else
                               <button class="btn btn-secondary" disabled>Tidak Tersedia</button>
                           @endif
@@ -283,7 +284,7 @@
   </div>
 
 <!-- Contact Information & Footer -->
-<footer class="footer">
+<footer class="footer footer-custom">
     <div class="container p-4">
         <div class="row">
             <!-- Tentang Laundry -->
