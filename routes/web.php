@@ -46,7 +46,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/receipt/{id}', [BookingController::class, 'showReceipt'])->name('receipt.show');
 });
 
-
 // Grup route umum (user login)
 Route::middleware(['auth'])->group(function () {
     // Profile user
@@ -55,11 +54,23 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 }); 
 
-//Notification route
+//Notification route gmail
 Route::prefix('admin')->middleware(['auth', 'admin'])->name('admin.')->group(function () {
     Route::get('/notifications', [\App\Http\Controllers\Admin\NotificationController::class, 'index'])->name('notifications.index');
 });
 
+//Notification route cash payment
+Route::middleware(['auth'])->group(function () {
+    Route::post('/booking/confirm-cash/{id}', [\App\Http\Controllers\BookingController::class, 'confirmCashPayment'])->name('booking.confirmCashPayment');
+});
+
+Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
+    Route::post('/booking/confirm-cash/{id}', [\App\Http\Controllers\BookingController::class, 'confirmCashPayment'])->name('admin.booking.confirmCashPayment');
+
+    Route::get('/notifications/cash', [\App\Http\Controllers\Admin\NotificationController::class, 'cashNotifications'])->name('admin.notifications.cash');
+
+    Route::delete('/notifications/{id}', [\App\Http\Controllers\Admin\NotificationController::class, 'destroy'])->name('admin.notifications.destroy');
+});
 
 //midtrans payment token
 Route::post('/payment/token', [PaymentController::class, 'createSnapToken']);
@@ -86,7 +97,6 @@ Route::get('/api/get-snap-token', function () {
 
     return response()->json(['snap_token' => $snapToken]);
 });
-
 
 require __DIR__.'/auth.php';
 

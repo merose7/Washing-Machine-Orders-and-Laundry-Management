@@ -14,5 +14,6 @@ class Machine extends Model
         'status',
         'price',
         'description',
+        'booking_ends_at', //time
     ];
 }

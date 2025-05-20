@@ -15,30 +15,56 @@
 
         <input type="hidden" name="machine_id" value="{{ $machineId }}">
 
-        <div class="mb-3">
-            <label for="name" class="form-label">Nama</label>
-            <input type="text" name="name" id="name" class="form-control" required>
-        </div>
+        <!-- Removed unused name input field as customer_name is taken from Auth user -->
 
-        <div class="mb-3">
-            <label for="booking_time" class="form-label">Waktu Booking</label>
-            <input type="datetime-local" name="booking_time" id="booking_time" class="form-control" required>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+            <label for="booking_date" class="form-label">Tanggal Booking</label>
+            <input type="date" class="form-control" id="booking_date" name="booking_date" required>
         </div>
+        <div class="col-md-6 mb-3">
+            <label for="booking_time" class="form-label">Waktu Booking</label>
+            <input type="time" class="form-control" id="booking_time" name="booking_time" required>
+        </div>
+</div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const now = new Date();
+document.addEventListener('DOMContentLoaded', function () {
+    const dateInput = document.getElementById('booking_date');
+    const timeInput = document.getElementById('booking_time');
+    const now = new Date();
 
-        // Format jadi 'YYYY-MM-DDTHH:MM'
-        const pad = (n) => n.toString().padStart(2, '0');
-        const todayStr = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
+    // Helper padding function
+    const pad = (n) => n.toString().padStart(2, '0');
 
-        const endOfDayStr = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}T23:59`;
-        
-        const bookingInput = document.getElementById('booking_time');
-        bookingInput.min = todayStr; // membatasi user untuk tidak bisa memilih waktu sebelum saat ini
-        bookingInput.max = endOfDayStr; //membatasi user untuk bisa booking sampai jam 23:59 hari ini
-    });
+    // Set minimum date to today
+    const todayStr = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+    dateInput.min = todayStr;
+
+    // Update time input min/max based on selected date
+    const updateTimeLimits = () => {
+        const selectedDate = new Date(dateInput.value);
+        const isToday = selectedDate.toDateString() === now.toDateString();
+
+        if (isToday) {
+            // If today, restrict time from current time to 23:59
+            const minTime = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
+            timeInput.min = minTime;
+            timeInput.max = '23:59';
+        } else {
+            // Any future date, allow full day
+            timeInput.min = '00:00';
+            timeInput.max = '23:59';
+        }
+    };
+
+    dateInput.addEventListener('change', updateTimeLimits);
+    
+    // Initialize time limit on load if date is pre-filled
+    if (dateInput.value) {
+        updateTimeLimits();
+    }
+});
 </script>
 
         <div class="mb-3">

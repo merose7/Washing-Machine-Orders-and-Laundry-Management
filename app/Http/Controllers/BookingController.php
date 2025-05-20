@@ -26,19 +26,24 @@ class BookingController extends Controller
         return view('booking.create', compact('machineId'));
     }
 
-    // Removed processBooking method as store method handles booking creation and redirect
     public function store(Request $request)
     {
         $request->validate([
             'machine_id' => 'required|exists:machines,id',
-            'booking_time' => 'required|date',
+            'booking_date' => 'required|date',
+            'booking_time' => 'required',
+            'booking_duration' => 'required|integer|min:1', // duration in minutes
             'payment_method' => 'required|in:cash,midtrans',
         ]);
+
+        // Combine booking_date and booking_time into a single datetime string
+        $bookingStart = \Carbon\Carbon::parse($request->booking_date . ' ' . $request->booking_time . ':00');
+        $bookingEnd = $bookingStart->copy()->addMinutes($request->booking_duration);
 
         $booking = Booking::create([
             'customer_name' => Auth::user()->name,
             'machine_id' => $request->machine_id,
-            'booking_time' => $request->booking_time,
+            'booking_time' => $bookingStart,
             'payment_method' => $request->payment_method,
             'payment_status' => 'pending',
             'status' => 'pending',
@@ -46,10 +51,11 @@ class BookingController extends Controller
         $booking->payment_status = $request->payment_method === 'cash' ? 'pending' : 'pending';
         $booking->save();
 
-        // Update machine status to booked
+        // Update machine status to booked and set booking_ends_at
         $machine = \App\Models\Machine::find($request->machine_id);
         if ($machine) {
             $machine->status = 'booked';
+            $machine->booking_ends_at = $bookingEnd; // set booking end time based on duration
             $machine->save();
         }
 
@@ -124,7 +130,7 @@ public function payment($id)
 
         $params = [
             'transaction_details' => [
-                'order_id' => $booking->id,
+                'order_id' => 'BOOKING-' . $booking->id,
                 'gross_amount' => 10000, 
             ],
             'customer_details' => [
@@ -145,12 +151,22 @@ public function payment($id)
     private function sendNotification($booking, $message)
     {
         try {
+            // Determine payment method for notification title
+            $title = 'Booking Notification';
+            $paymentMethod = $booking->payment_method;
+
+            if ($paymentMethod === 'midtrans') {
+                $title = 'Gmail Notification';
+            } elseif ($paymentMethod === 'cash') {
+                $title = 'Cash Payment Notification';
+            }
+
             // Save notification to DB
             Notification::create([
-                'title' => 'Booking Notification',
-                'message' => $message,
+                'title' => $title,
+                'message' => $message . ' (Booking ID ' . $booking->id . ')',
                 'is_read' => false,
-                'payment_method' => $booking->payment_method,
+                'payment_method' => $paymentMethod,
             ]);
 
             // Send email notification
@@ -176,4 +192,35 @@ public function payment($id)
     ]);
 }
 
+    public function confirmCashPayment($id)
+    {
+        $booking = Booking::findOrFail($id);
+
+        if ($booking->payment_method !== 'cash') {
+            return redirect()->back()->with('error', 'Pembayaran bukan metode cash.');
+        }
+
+        if ($booking->payment_status === 'paid') {
+            return redirect()->back()->with('info', 'Pembayaran cash sudah dikonfirmasi.');
+        }
+
+        $booking->payment_status = 'paid';
+        $booking->status = 'confirmed';
+        $booking->save();
+
+        // Remove existing cash payment notification for this booking
+        Notification::where('payment_method', 'cash')
+            ->where('message', 'like', '%Booking ID ' . $booking->id . '%')
+            ->delete();
+
+        // Create a new notification with descriptive message
+        Notification::create([
+            'title' => 'Konfirmasi Pembayaran Cash',
+            'message' => 'Konfirmasi pembayaran cash customer untuk Booking ID ' . $booking->id . ' telah diterima.',
+            'payment_method' => 'cash',
+            'is_read' => false,
+        ]);
+
+        return redirect()->back()->with('success', 'Pembayaran cash telah dikonfirmasi.');
+    }
 }

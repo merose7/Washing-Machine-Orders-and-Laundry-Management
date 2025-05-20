@@ -20,9 +20,14 @@ class DashboardAdminController extends Controller
         $recentBookings = Booking::orderBy('created_at', 'desc')->take(10)->get();
         $recentNotifications = Notification::orderBy('created_at', 'desc')->take(10)->get();
 
+        $recentGmailNotifications = Notification::where('payment_method', '!=', 'cash')
+            ->orderBy('created_at', 'desc')
+            ->take(10)
+            ->get();
+
         return view('admin.dashboard', compact(
             'totalMachines', 'totalBookings', 'totalPayments', 'totalNotifications',
-            'recentBookings', 'recentNotifications'
+            'recentBookings', 'recentNotifications', 'recentGmailNotifications'
         ));
     }
 }
