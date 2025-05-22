@@ -47,7 +47,7 @@
         @foreach($machines as $machine)
             <tr>
                 <td>{{ $machine->name }}</td>
-                <td>
+                    <td>
                         @if($machine->status === 'available')
                             <span class="badge bg-success">Tersedia</span>
                         @elseif($machine->status === 'booked')

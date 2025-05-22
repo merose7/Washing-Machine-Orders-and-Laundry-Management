@@ -66,9 +66,7 @@ Route::middleware(['auth'])->group(function () {
 
 Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::post('/booking/confirm-cash/{id}', [\App\Http\Controllers\BookingController::class, 'confirmCashPayment'])->name('admin.booking.confirmCashPayment');
-
     Route::get('/notifications/cash', [\App\Http\Controllers\Admin\NotificationController::class, 'cashNotifications'])->name('admin.notifications.cash');
-
     Route::delete('/notifications/{id}', [\App\Http\Controllers\Admin\NotificationController::class, 'destroy'])->name('admin.notifications.destroy');
 });
 

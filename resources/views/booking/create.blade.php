@@ -13,6 +13,16 @@
     <form action="/booking" method="POST" class="p-4 shadow rounded bg-white">
         @csrf
 
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul class="mb-0">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
         <input type="hidden" name="machine_id" value="{{ $machineId }}">
 
         <!-- Removed unused name input field as customer_name is taken from Auth user -->
@@ -25,6 +35,10 @@
         <div class="col-md-6 mb-3">
             <label for="booking_time" class="form-label">Waktu Booking</label>
             <input type="time" class="form-control" id="booking_time" name="booking_time" required>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label for="booking_duration" class="form-label">Durasi Booking (menit)</label>
+            <input type="number" class="form-control" id="booking_duration" name="booking_duration" min="1" required>
         </div>
 </div>
 

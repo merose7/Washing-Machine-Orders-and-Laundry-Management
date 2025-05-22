@@ -27,9 +27,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="{{ asset('css/dailywash-style.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/dailywash-responsive.css') }}">
-    <link href="{{ asset('css/home.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('css/home.css') }}">
 
   </head>
   <script>
@@ -65,35 +63,48 @@
   </div>
 
   <!-- ***** Header Area Start ***** -->
-  <header class="header-area header-sticky wow slideInDown" data-wow-duration="0.75s" data-wow-delay="0s">
-    <div class="container">
-      <div class="row">
-        <div class="col-12">
-          <nav class="main-nav">
-            <!-- ***** Logo Start ***** -->
-            <a href="#top" class="logo">
-              <img src="{{ asset('images\Logo_The_Daily_Wash-removebg-preview.png') }}" alt="Logo" style="height: 70px; width: auto;"> 
-            </a>
-            <!-- ***** Logo End ***** -->
-            <!-- ***** Menu Start ***** -->
-            <ul class="nav">
-              <li class="scroll-to-section"><a href="#home">Home</a></li>
-              <li class="scroll-to-section"><a href="#mesin-cuci">Booking</a></li>
-              <li class="scroll-to-section"><a href="#review">Reviews</a></li>
-              <li class="scroll-to-section"><a href="#contact">Location</a></li>
+ <header class="header-area header-sticky wow slideInDown" data-wow-duration="0.75s" data-wow-delay="0s">
+  <div class="container">
+    <div class="row">
+      <div class="col-12">
+        <nav class="main-nav d-flex justify-content-between align-items-center">
+          <!-- ***** Logo Start ***** -->
+          <a href="#top" class="logo">
+            <img src="{{ asset('images/Logo_The_Daily_Wash-removebg-preview.png') }}" alt="Logo" style="height: 70px; width: auto;"> 
+          </a>
+          <!-- ***** Logo End ***** -->
+
+          <!-- ***** Menu Start ***** -->
+          <ul class="nav d-flex align-items-center m-0">
+            <li class="scroll-to-section"><a href="#home">Home</a></li>
+            <li class="scroll-to-section"><a href="#mesin-cuci">Booking</a></li>
+            <li class="scroll-to-section"><a href="#review">Reviews</a></li>
+            <li class="scroll-to-section"><a href="#contact">Location</a></li>
+            <li class="scroll-to-section">
+              <a href="{{ route('logout') }}"
+                 onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                 Logout
+              </a>
+              <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                  @csrf
+              </form>
+            </li>
+
+            @auth
               <li class="scroll-to-section">
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <button type="submit" class="btn btn-link border-0 p-0 m-0 align-baseline">Logout</button>
-                </form>
+                <a href="#" class="nav-link text-dark" style="cursor: default;">
+                  Hello, {{ Auth::user()->name }}
+                </a>
               </li>
-</ul>
-            <!-- ***** Menu End ***** -->
-          </nav>
-        </div>
+            @endauth
+          </ul>
+          <!-- ***** Menu End ***** -->
+        </nav>
       </div>
     </div>
-  </header>
+  </div>
+</header>
+
 
   <!-- ***** Header Area End ***** -->
   </a>
@@ -149,35 +160,30 @@
       </div>
     </div>
 
-    <div class="container mt-5">
-      <div class="row">
-          @foreach($machines as $machine)
-              <div class="col-md-4 mb-3">
-                  <div class="card h-100">
-                      <div class="card-body">
-                          <h5 class="card-title">{{ $machine->name }}</h5>
-                          <p>Status: 
-                              @if($machine->status == 'available')
-                                  <span class="badge bg-success">Tersedia</span>
-                              @elseif($machine->status == 'booked')
-                                  <span class="badge bg-warning text-dark">Dibooking</span>
-                              @else
-                                  <span class="badge bg-danger">Perbaikan</span>
-                              @endif
-                          </p>
-                          @if($machine->status == 'available')
-                          <a href="{{ route('booking.create', ['machine_id' => $machine->id]) }}" class="btn btn-danger">Booking Sekarang</a>
-                          @else
-                              <button class="btn btn-secondary" disabled>Tidak Tersedia</button>
-                          @endif
-                      </div>
-                  </div>
-              </div>
-          @endforeach
-      </div>
-  </div>
-  
-  
+   <div class="container mt-5">
+    <div class="row">
+        @foreach($machines as $machine)
+            <div class="col-md-4 mb-4">
+                <div class="card-machine">
+                    <div class="machine-title">{{ $machine->name }}</div>
+                    <div class="text-center">
+                        <img src="{{ asset('images/WASH MACHINE.png') }}" alt="Machine Image">
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <div class="machine-price">Rp 10.000/7Kg</div>
+                        @if($machine->status == 'available')
+                            <a href="{{ route('booking.create', ['machine_id' => $machine->id]) }}" class="btn btn-light machine-button">Tersedia</a>
+                        @else
+                            <button class="btn btn-secondary machine-button" disabled>Tidak Tersedia</button>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        @endforeach
+    </div>
+</div>
+
+
 <!-- Daftar Ulasan Pelanggan-->
 <section id="review">
 <div class="container mt-5">
@@ -194,16 +200,6 @@
   <div class="mt-4 overflow-auto" style="white-space: nowrap;">
     <!-- Card wrapper -->
     <div class="d-inline-flex" style="gap: 16px; padding-bottom: 10px;">
-
-      <!-- Card 1 -->
-      <div class="card review-card" style="min-width: 250px;">
-        <div class="card-body">
-          <h5 class="card-title">Rina S.</h5>
-          <p class="card-text text-muted">📝 Pelayanannya cepat dan mesin cucinya bersih. Harga terjangkau!</p>
-          <div style="color: #f0ad4e;">Rating: 5/5 ⭐</div>
-          <p><strong>Komentar:</strong> Sangat puas, pasti kembali lagi!</p>
-        </div>
-      </div>
 
       <!-- Card 2 -->
       <div class="card review-card" style="min-width: 250px;">
@@ -283,9 +279,8 @@
     </div>
   </div>
 
-<!-- Contact Information & Footer -->
 <footer class="footer footer-custom">
-    <div class="container p-4">
+    <div class="container-fluid px-5 py-4">
         <div class="row">
             <!-- Tentang Laundry -->
             <div class="col-lg-6 col-md-12 mb-4">
@@ -300,7 +295,7 @@
                 <h6 class="mb-3 footer-title">Contact</h6>
                 <ul class="list-unstyled mb-0">
                     <li class="mb-1">
-                        <a href="#!" class="footer-link">Jl. Ketintang Baru III No.50c, Surabaya</a>
+                        <a href="https://maps.google.com/maps?q=Ketintang,Surabaya&t=&z=13&ie=UTF8&iwloc=&output=embed" class="footer-link">Jl. Ketintang Baru III No.50c, Surabaya</a>
                     </li>
                     <li class="mb-1">
                         <a href="mailto:contact@dailywash.com" class="footer-link">contact@dailywash.com</a>
@@ -309,7 +304,7 @@
                         <a href="tel:+6281234567890" class="footer-link">+62 812-3456-7890</a>
                     </li>
                     <li>
-                        <a href="#!" class="footer-link">Where we deliver?</a>
+                        <a href="https://maps.google.com/maps?q=Ketintang,Surabaya&t=&z=13&ie=UTF8&iwloc=&output=embed" class="footer-link">Where we deliver?</a>
                     </li>
                 </ul>
             </div>

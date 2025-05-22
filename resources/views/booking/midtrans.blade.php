@@ -49,6 +49,7 @@ const payButton = document.getElementById("pay-button");
 console.log("Pay button found:", payButton);
 if (payButton) {
     payButton.addEventListener("click", function() {
+        console.log("Bayar Sekarang button clicked");
         fetch('/payment/token', {
             method: 'POST',
             headers: {
@@ -59,21 +60,47 @@ if (payButton) {
                 booking_id: {{ $booking->id }},
                 name: "{{ $booking->customer_name }}",
                 email: "{{ auth()->user()->email ?? '' }}",
-                phone: ""
+                phone: "{{ auth()->user()->phone ?? '' }}"
             })
         })
-        .then(response => response.json())
+        .then(response => {
+            console.log("Fetch response status:", response.status);
+            if (!response.ok) {
+                throw new Error("Network response was not ok");
+            }
+            return response.json();
+        })
         .then(data => {
+            console.log("Snap token received:", data.snap_token);
+            if (!data.snap_token) {
+                throw new Error("Snap token missing in response");
+            }
             window.snap.pay(data.snap_token, {
-                onSuccess: function(result){ console.log("Success", result); },
-                onPending: function(result){ console.log("Pending", result); },
-                onError: function(result){ console.log("Error", result); },
-                onClose: function(){ alert("Popup ditutup tanpa transaksi."); }
+                onSuccess: function(result){
+                    console.log("Success", result);
+                    window.location.href = "{{ route('booking.receipt', $booking->id) }}";
+                },
+                onPending: function(result){
+                    console.log("Pending", result);
+                    window.location.href = "{{ route('booking.receipt', $booking->id) }}";
+                },
+                onError: function(result){ 
+                    console.log("Error", result); 
+                    alert("Terjadi kesalahan saat proses pembayaran. Silakan coba lagi.");
+                },
+                onClose: function(){ 
+                    alert("Popup ditutup tanpa transaksi."); 
+                }
             });
+        })
+        .catch(error => {
+            console.error("Fetch error:", error);
+            alert("Gagal mendapatkan token pembayaran. Silakan coba lagi.");
         });
     });
 } else {
     console.error("Pay button not found in DOM");
 }
+
 </script>
 @endsection

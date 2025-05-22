@@ -163,14 +163,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
     $('#bookingsTable').DataTable({
         language: {
-            search: "Cari:",
-            lengthMenu: "Tampilkan _MENU_ entri",
-            info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
-            paginate: {
-                previous: "Sebelumnya",
-                next: "Berikutnya"
-            }
-        }
+                    search: "Search:",
+                    lengthMenu: "_MENU_ records per page",
+                    info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                    paginate: {
+                        previous: "← Previous",
+                        next: "Next →"
+                    }
+                }
     });
 
     const totalMachinesBox = document.getElementById('totalMachinesBox');

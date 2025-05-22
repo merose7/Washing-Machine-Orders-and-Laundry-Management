@@ -9,7 +9,7 @@ body {
     font-family: 'Inter', sans-serif;
     background-color: white;
     color: #333;
-    margin-top: 60px; /* adjust for fixed header */
+    margin-top: 60px;
 }
 
 /* Preloader */
@@ -67,16 +67,23 @@ body {
 
 /* Header */
 .header-area {
-    background-color: #ffffff;
+    background-color: #ff0019ef;
     padding: 10px 0;
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     z-index: 1000;
-    transition: z-index 0.3s ease;
+    transition: top 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+.header-area .logo {
+    max-width: 150px;
+    height: auto;
+    margin-right: auto;
 }
 
+/* Main Navigation */
 .main-nav {
     display: flex;
     justify-content: space-between;
@@ -84,21 +91,68 @@ body {
     padding: 0 20px;
 }
 
+/* Nav List */
 .main-nav .nav {
     display: flex;
-    gap: 15px;
-    list-style-type: none;
+    align-items: center;
+    gap: 20px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
 }
 
+/* Nav Item Link */
 .main-nav .nav li a {
+    display: block;
+    padding: 10px 15px;
     text-decoration: none;
-    color: #000000;
+    color: #ffffff;
     font-size: 16px;
     font-weight: 600;
+    transition: color 0.3s ease;
 }
 
 .main-nav .nav li a:hover {
-    color: #ff0000;
+    color: #ddd;
+}
+
+/* Optional: Hello username styling */
+.main-nav .nav li .nav-link.text-dark {
+    color: #ddd !important;
+    font-weight: 500;
+    cursor: default;
+}
+
+/* Responsive (optional if needed) */
+@media screen and (max-width: 768px) {
+    .main-nav {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .main-nav .nav {
+        flex-direction: column;
+        width: 100%;
+        gap: 10px;
+        padding-top: 10px;
+    }
+
+    .main-nav .nav li a {
+        width: 100%;
+        padding: 10px;
+    }
+}
+
+/* Style for logged-in username in navbar */
+.nav .nav-item .nav-link {
+    display: flex;
+    margin-left: 0px;
+    margin-right: 10px;    
+    padding: 0.5rem 1rem;
+    font-weight: 600;
+    font-size: 1rem;
+    color: #ffffff; /* white text color to match navbar */
+    cursor: default;
 }
 
 /* Main Banner */
@@ -134,11 +188,11 @@ body {
     font-size: 24px;
     font-weight: 400;
     margin-bottom: 20px;
-    color: #ff0000;
+    color: #420303;
 }
 
 .main-banner .border-first-button a {
-    background-color: #dc3545;
+    background-color: #ff0019f0;
     color: #ffffff;
     padding: 12px 24px;
     text-decoration: none;
@@ -150,7 +204,7 @@ body {
 }
 
 .main-banner .border-first-button a:hover {
-    background-color: #c82333;
+    background-color: #9d0010;
     transform: translateY(-2px);
 }
 
@@ -181,28 +235,52 @@ section {
     padding: 60px 0;
 }
 
-#mesin-cuci .card {
-    border: 1px solid #f1f1f1;
-    border-radius: 8px;
+.card-machine {
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 16px;
+    transition: transform 0.3s ease;
+    background-color: #fff;
+    height: 100%;
 }
 
-#mesin-cuci .card-body {
+.card-machine:hover {
+    transform: translateY(-4px);
+}
+
+.card-machine img {
+    max-width: 180px;
+    height: auto;
+    border-radius: 10px;
+    margin-bottom: 12px;
+}
+
+.machine-title {
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 12px;
     text-align: center;
 }
 
-#mesin-cuci .card-title {
-    font-size: 20px;
+.machine-price {
     font-weight: 600;
+    font-size: 1rem;
+    color: #333;
 }
 
-#mesin-cuci .card p {
-    font-size: 16px;
+.machine-button {
+    font-weight: 600;
+    padding: 6px 16px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    background-color: #ff0000;
+    color: #fff;
 }
 
-#mesin-cuci .card .btn {
-    font-size: 14px;
-    padding: 8px 20px;
-    margin-top: 15px;
+@media (max-width: 768px) {
+    .card-machine img {
+        max-width: 150px;
+    }
 }
 
 /* Review */
@@ -210,6 +288,7 @@ section {
     font-size: 28px;
     font-weight: 700;
     color: #000000;
+    margin-bottom: 20px;
 }
 
 .section-heading h4 em {
@@ -226,7 +305,7 @@ section {
 }
 
 #review .review-card {
-    border-radius: 8px;
+    border-radius: 5px;
 }
 
 #review .card-body {
@@ -234,19 +313,36 @@ section {
 }
 
 #review .card-title {
-    font-size: 18px;
-    font-weight: 600;
+    font-size: 15px;
+    font-weight: 700;
+    color: #000000;
+    margin-bottom: 10px;
 }
 
 #review .card-text {
     font-size: 14px;
     margin-bottom: 10px;
+    color: #555;
+
 }
 
 #review .review-card .card-body .f0ad4e {
     color: #f0ad4e;
 }
 
+/* Scrollbar customization (optional) */
+.overflow-auto::-webkit-scrollbar {
+  height: 8px;
+}
+
+.overflow-auto::-webkit-scrollbar-track {
+  background: #eeeeee00;
+}
+
+.overflow-auto::-webkit-scrollbar-thumb {
+  background-color: #cccccc00;
+  border-radius: 10px;
+}
 
 
 /* Contact Section */
@@ -258,14 +354,17 @@ section {
 /* Contact Us Section Title */
 .section-heading h6 {
     margin-bottom: 10px; /* jarak antara "Location" dan judul */
+    font-size: 30px;
+    font-weight: 400;
+    color: #000000;
 }
 
 .section-heading h4 {
-    margin-bottom: 20px; /* jarak antara "Get In Touch With Us Now" dan garis bawah */
+    margin-bottom: 20px; 
 }
 
 .line-dec {
-    margin-bottom: 30px; /* Memberikan jarak antara garis bawah dan peta */
+    margin-bottom: 30px;
 }
 
 /* Map Container */
@@ -277,65 +376,70 @@ section {
     margin-bottom: 30px; /* Menambahkan jarak bawah pada peta */
 }
 
-/* Footer */
-.footer {
-    background-color: #f8f9fa;
-    color: #333;
-    padding: 30px 0;
+/* Footer Styling */
+.footer-custom {
+    max-width: 2000px;    
+    margin: 0;
+    padding: 0;
+    background-color: #ff0019ef;
+    color: #f8f9fa;
+    font-size: 0.95rem;
+    border-top: 4px solid #5a5f65bb;
+    position: relative;
+    overflow-x: hidden;
 }
 
-.footer .footer-title {
-    font-size: 18px;
-    font-weight: bold;
-    color: #000000;
+.footer-custom .footer-title {
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: #ffffff;
+  font-size: 1.1rem;
 }
 
-.footer .footer-text {
-    font-size: 14px;
-    color: #555;
-    line-height: 1.6;
+.footer-custom .footer-text {
+  color: #ffffff;
+  line-height: 1.6;
 }
 
-.footer .footer-link {
-    text-decoration: none;
-    color: #007bff;
+.footer-custom .footer-link {
+  color: #000000;
+  text-decoration: none;
+  display: block;
+  transition: color 0.3s ease;
 }
 
-.footer .footer-link:hover {
-    color: #0056b3;
-    text-decoration: underline;
+.footer-custom .footer-link:hover {
+  color: #000000;
+  text-decoration: underline;
 }
 
-.footer .footer-copyright {
-    background-color: #343a40;
-    color: white;
-    padding: 10px 0;
-    font-size: 14px;
+.footer-custom .footer-table td {
+  padding: 2px 4px;
+  color: #000000;
 }
 
-.footer .footer-table {
-    width: 100%;
-    color: #555;
-    font-size: 14px;
+.footer-copyright {
+  background-color: #cf2e2e;
+  color: #ffffff;
+  font-size: 0.9rem;
+    padding: 5px 0;
 }
 
-.footer .footer-table td {
-    padding: 5px 10px;
-}
+/* Responsive spacing */
+@media (max-width: 767px) {
+  .footer-custom .footer-title {
+    font-size: 1rem;
+  }
 
-.footer .footer-table tr:nth-child(even) {
-    background-color: #f1f1f1;
-}
+  .footer-custom {
+    text-align: center;
+  }
 
-.footer .list-unstyled {
-    padding-left: 0;
-    list-style-type: none;
+  .footer-custom .col-lg-3,
+  .footer-custom .col-lg-6 {
+    margin-bottom: 20px;
+  }
 }
-
-.footer .list-unstyled li {
-    margin-bottom: 10px;
-}
-
 
 @media (max-width: 575px) {
     .footer .footer-title {
@@ -355,7 +459,7 @@ section {
     }
 }
 
-/* Floating Button */
+/* Button Whatsapp */
 .floating-btn1 {
     position: fixed;
     bottom: 20px;

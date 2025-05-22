@@ -41,7 +41,7 @@
             </a>
             <ul class="nav nav-treeview" style="display: none;">
                 <li class="nav-item">
-                    <a href="#" class="nav-link" id="toggleMachinesList">
+                    <a href="{{url('admin/machines')}}" class="nav-link" id="toggleMachinesList">
                         <i class="far fa-circle nav-icon"></i>
                         <p>Daftar Mesin</p>
                     </a>
