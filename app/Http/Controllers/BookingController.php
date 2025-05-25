@@ -19,12 +19,18 @@ class BookingController extends Controller
         return app(HomeController::class)->index();
     }
 
+    public function indexAdmin()
+    {
+        $bookings = \App\Models\Booking::with('machine')->orderBy('booking_time', 'desc')->paginate(10);
+        return view('admin.bookings', compact('bookings'));
+    }
+
     public function paymentNotification(Request $request)
     {
-        \Midtrans\Config::$serverKey = env('MIDTRANS_SERVER_KEY');
-        \Midtrans\Config::$isProduction = env('MIDTRANS_IS_PRODUCTION', false);
-        \Midtrans\Config::$isSanitized = true;
-        \Midtrans\Config::$is3ds = true;
+        \Midtrans\Config::$serverKey = config('midtrans.server_key');
+        \Midtrans\Config::$isProduction = config('midtrans.is_production');
+        \Midtrans\Config::$isSanitized = config('midtrans.is_sanitized');
+        \Midtrans\Config::$is3ds = config('midtrans.is_3ds');
 
         $notification = new \Midtrans\Notification();
 
@@ -152,18 +158,20 @@ public function payment($id)
 
     public function getMidtransToken($id)
     {
-        $booking = Booking::findOrFail($id);
+        $booking = Booking::with('machine')->findOrFail($id);
 
         // Set Midtrans configuration
-        Config::$serverKey = config('services.midtrans.server_key');
-        Config::$isProduction = config('services.midtrans.is_production');
+        Config::$serverKey = config('services.midtrans.serverKey');
+        Config::$isProduction = config('services.midtrans.isProduction');
         Config::$isSanitized = true;
         Config::$is3ds = true;
+
+        $grossAmount = $booking->machine ? $booking->machine->price : 10000;
 
         $params = [
             'transaction_details' => [
                 'order_id' => 'BOOKING-' . $booking->id,
-                'gross_amount' => 10000, 
+                'gross_amount' => $grossAmount,
             ],
             'customer_details' => [
                 'first_name' => $booking->customer_name,
@@ -171,8 +179,13 @@ public function payment($id)
             ],
         ];
 
+        \Log::info('Midtrans grossAmount: ' . $grossAmount);
+        \Log::info('Midtrans orderId: BOOKING-' . $booking->id);
+        \Log::info('Midtrans customer email: ' . auth()->user()->email);
+
         try {
             $snapToken = Snap::getSnapToken($params);
+            \Log::info('Midtrans snapToken generated: ' . $snapToken);
             return response()->json(['token' => $snapToken]);
         } catch (\Exception $e) {
             Log::error('Midtrans Snap Token Error: ' . $e->getMessage());

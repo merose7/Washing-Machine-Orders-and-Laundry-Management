@@ -1,7 +1,18 @@
 @extends('layouts.admin')
 
 @section('title', 'Dashboard Admin')
+<head>
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
 
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+</head>
 @section('content_header')
     <h1>Dashboard Admin Laundry</h1>
     <p>Selamat datang di panel admin</p>
@@ -58,7 +69,7 @@
         <div class="small-box bg-danger">
             <div class="inner">
                 <h3>{{ $totalNotifications }}</h3>
-                <p>Email Notifikasi</p>
+                <p>Gmail Notifikasi</p>
             </div>
             <div class="icon">
                 <i class="fas fa-envelope"></i>
@@ -75,13 +86,12 @@
         <div class="card-header">
             <h3 class="card-title">Daftar Mesin Cuci</h3>
         </div>
-        <div class="card-body table-responsive p-0" style="max-height: 400px;">
+        <div class="card-body table-responsive" style="max-height: 400px; overflow-x: auto; padding: 1rem;">
             <table id="machinesTable" class="table table-bordered table-striped text-center align-middle">
                 <thead>
                     <tr>
                         <th>Nama</th>
                         <th>Status</th>
-                        <th>Deskripsi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -103,7 +113,6 @@
                                 </span>
                             @endif
                         </td>
-                        <td>{{ $machine->description }}</td>
                     </tr>
                     @endforeach
                 </tbody>
@@ -117,7 +126,7 @@
         <div class="card-header">
             <h3 class="card-title">Daftar Booking</h3>
         </div>
-        <div class="card-body table-responsive p-0" style="max-height: 400px;">
+        <div class="card-body table-responsive" style="max-height: 400px; overflow-x: auto; padding: 1rem;">
             <table id="bookingsTable" class="table table-bordered table-striped text-center align-middle">
                 <thead>
                     <tr>
@@ -150,27 +159,34 @@
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     $('#machinesTable').DataTable({
+        pagingType: 'simple_numbers', // => < 1 2 3 > style
         language: {
             search: "Cari:",
             lengthMenu: "Tampilkan _MENU_ entri",
             info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
             paginate: {
-                previous: "Sebelumnya",
-                next: "Berikutnya"
-            }
+                previous: "← Previous",
+                next: " Next →"
+            },
+            zeroRecords: "Tidak ditemukan data yang cocok",
+            infoEmpty: "Tidak ada data",
+            infoFiltered: "(difilter dari _MAX_ total entri)"
         }
     });
 
     $('#bookingsTable').DataTable({
         language: {
-                    search: "Search:",
-                    lengthMenu: "_MENU_ records per page",
-                    info: "Showing _START_ to _END_ of _TOTAL_ entries",
-                    paginate: {
-                        previous: "← Previous",
-                        next: "Next →"
-                    }
-                }
+            search: "Cari:",
+            lengthMenu: "Tampilkan _MENU_ entri",
+            info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
+            paginate: {
+                previous: "← Previous",
+                next: " Next →"
+            },
+            zeroRecords: "Tidak ditemukan data yang cocok",
+            infoEmpty: "Tidak ada data",
+            infoFiltered: "(difilter dari _MAX_ total entri)"
+        }
     });
 
     const totalMachinesBox = document.getElementById('totalMachinesBox');

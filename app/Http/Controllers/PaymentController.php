@@ -55,4 +55,25 @@ class PaymentController extends Controller
             return response()->json(['error' => 'Failed to generate snap token'], 500);
         }
     }
+
+    public function index()
+    {
+        // Fetch payments separated by method
+        $cashPayments = \App\Models\Payment::where('payment_method', 'cash')->get();
+        $midtransPayments = \App\Models\Payment::where('payment_method', 'midtrans')->get();
+
+        // Calculate totals
+        $totalCashPayments = $cashPayments->sum('amount');
+        $totalMidtransPayments = $midtransPayments->sum('amount');
+        $totalPayments = $totalCashPayments + $totalMidtransPayments;
+
+        return view('admin.payments', compact(
+            'cashPayments',
+            'midtransPayments',
+            'totalCashPayments',
+            'totalMidtransPayments',
+            'totalPayments'
+        ));
+    }
 }
+

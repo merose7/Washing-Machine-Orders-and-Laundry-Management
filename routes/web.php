@@ -8,7 +8,12 @@ use App\Http\Controllers\MachineController;
 use Illuminate\Support\Facades\Route;
 use Midtrans\Snap;
 use App\Http\Controllers\PaymentController;
-use App\Http\Controllers\Admin\NotificationController;
+use App\Http\Controllers\Admin\NotificationController;            
+
+// Root landing page with logo and login/register
+Route::get('/', function () {
+    return view('welcome');
+});
 
 // Halaman utama pelanggan
 //Route::get('/laundryhome', [HomeController::class, 'index']);
@@ -24,7 +29,7 @@ Route::get('/booking/receipt/{id}', [BookingController::class, 'receipt'])->name
 Route::get('/booking/payment/{id}', [BookingController::class, 'payment'])->name('booking.payment');
 Route::post('/booking/payment/notification', [BookingController::class, 'paymentNotification'])->name('booking.paymentNotification');
 
-// Admin route
+// Admin route 
 Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin/dashboard', [DashboardAdminController::class, 'index'])->name('admin.dashboard');
     Route::resource('/admin/machines', MachineController::class);
@@ -72,6 +77,8 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
 
 //midtrans payment token
 Route::post('/payment/token', [PaymentController::class, 'createSnapToken']);
+Route::get('/admin/payments', [PaymentController::class, 'index'])->name('admin.payments'); //payment history for admin
+Route::get('/admin/bookings', [BookingController::class, 'indexAdmin'])->name('admin.bookings');
 Route::get('/receipt/{id}', [BookingController::class, 'showReceipt'])->name('receipt.show');
 
 Route::middleware(['auth'])->group(function () {

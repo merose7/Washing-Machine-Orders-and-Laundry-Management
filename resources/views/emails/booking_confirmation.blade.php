@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Booking Confirmation</title>
+    <title>The Daily Wash Notification</title>
 </head>
 <body>
-    <h1>Booking Confirmation</h1>
-    <p>Dear {{ $name }},</p>
-    <p>{{ $message }}</p>
-    <p>Booking Time: {{ $booking_time }}</p>
-    <p>Machine ID: {{ $machine_id }}</p>
-    <p>Thank you for using our service.</p>
+    <h1>Notifikasi Booking </h1>
+    <p>Dear {{ $data['name'] }},</p>
+    <p>{{ $data['message'] }}</p>
+    <p>Booking Time: {{ $data['booking_time'] }}</p>
+    <p>Machine ID: {{ $data['machine_id'] }}</p>
+    <p>Terima Kasih. Sudah Menggunakan Jasa Laundry The Daily Wash</p>
 </body>
 </html>

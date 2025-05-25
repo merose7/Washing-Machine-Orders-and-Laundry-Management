@@ -58,10 +58,10 @@
                     </td>
                 <td>
                     <div class="d-flex justify-content-center gap-2">
-                        <a href="{{ route('machines.edit', $machine->id) }}" class="btn btn-sm btn-warning">
+                        <a href="{{ route('machines.edit', $machine->id) }}" class="btn btn-sm btn-warning me-2" style="margin-right: 10px;">
                             <i class="fas fa-edit"></i> Edit
                         </a>
-                        <form action="{{ route('machines.destroy', $machine->id) }}" method="POST" onsubmit="return confirm('Yakin ingin hapus?')">
+                        <form action="{{ route('machines.destroy', $machine->id) }}" method="POST" onsubmit="return confirm('Yakin ingin hapus?')" class="ms-2">
                             @csrf
                             @method('DELETE')
                             <button class="btn btn-sm btn-danger">

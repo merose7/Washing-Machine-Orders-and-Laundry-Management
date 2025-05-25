@@ -9,7 +9,7 @@ class MachineController extends Controller
 {
     public function index()
     {
-        $machines = Machine::all();
+        $machines = Machine::paginate(10);
         return view('admin.index', compact('machines'));
     }
 
