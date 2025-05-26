@@ -75,5 +75,17 @@ class PaymentController extends Controller
             'totalPayments'
         ));
     }
-}
 
+    public function getTotals()
+    {
+        $totalCashPayments = \App\Models\Payment::where('payment_method', 'cash')->sum('amount');
+        $totalMidtransPayments = \App\Models\Payment::where('payment_method', 'midtrans')->sum('amount');
+        $totalPayments = $totalCashPayments + $totalMidtransPayments;
+
+        return response()->json([
+            'totalCashPayments' => $totalCashPayments,
+            'totalMidtransPayments' => $totalMidtransPayments,
+            'totalPayments' => $totalPayments,
+        ]);
+    }
+}

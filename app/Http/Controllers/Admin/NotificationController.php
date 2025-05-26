@@ -61,4 +61,49 @@ class NotificationController extends Controller
 
         return redirect()->back()->with('success', 'Notifikasi berhasil dihapus.');
     }
+
+    public function editCashPaymentStatus(Request $request, $id)
+    {
+        $notification = Notification::findOrFail($id);
+
+        // Extract booking ID from notification message
+        preg_match('/Booking ID (\d+)/', $notification->message, $matches);
+        $bookingId = $matches[1] ?? null;
+
+        if (!$bookingId) {
+            return redirect()->back()->with('error', 'Booking ID tidak ditemukan dalam notifikasi.');
+        }
+
+        $booking = \App\Models\Booking::find($bookingId);
+        if (!$booking) {
+            return redirect()->back()->with('error', 'Booking tidak ditemukan.');
+        }
+
+        // Toggle payment status based on input or current status
+        $newStatus = $request->input('payment_status');
+        if (!in_array($newStatus, ['paid', 'unpaid'])) {
+            return redirect()->back()->with('error', 'Status pembayaran tidak valid.');
+        }
+
+        $booking->payment_status = $newStatus === 'paid' ? 'paid' : 'pending';
+        $booking->save();
+
+        // Update or create Payment record accordingly
+        if ($newStatus === 'paid') {
+            $amount = $booking->machine ? $booking->machine->price : 10000;
+            \App\Models\Payment::updateOrCreate(
+                ['booking_id' => $booking->id],
+                [
+                    'amount' => $amount,
+                    'status' => 'paid',
+                    'payment_method' => 'cash',
+                ]
+            );
+        } else {
+            // If unpaid, delete payment record if exists
+            \App\Models\Payment::where('booking_id', $booking->id)->delete();
+        }
+
+        return redirect()->back()->with('success', 'Status pembayaran cash berhasil diperbarui.');
+    }
 }

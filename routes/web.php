@@ -15,6 +15,9 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// Manual Midtrans payment status check route
+Route::get('/booking/payment/status/{id}', [BookingController::class, 'checkPaymentStatus'])->name('booking.paymentStatus');
+
 // Halaman utama pelanggan
 //Route::get('/laundryhome', [HomeController::class, 'index']);
 
@@ -73,11 +76,14 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::post('/booking/confirm-cash/{id}', [\App\Http\Controllers\BookingController::class, 'confirmCashPayment'])->name('admin.booking.confirmCashPayment');
     Route::get('/notifications/cash', [\App\Http\Controllers\Admin\NotificationController::class, 'cashNotifications'])->name('admin.notifications.cash');
     Route::delete('/notifications/{id}', [\App\Http\Controllers\Admin\NotificationController::class, 'destroy'])->name('admin.notifications.destroy');
+
+    Route::post('/notifications/cash/edit/{id}', [\App\Http\Controllers\Admin\NotificationController::class, 'editCashPaymentStatus'])->name('admin.notifications.cash.edit');
 });
 
 //midtrans payment token
 Route::post('/payment/token', [PaymentController::class, 'createSnapToken']);
 Route::get('/admin/payments', [PaymentController::class, 'index'])->name('admin.payments'); //payment history for admin
+Route::get('/admin/payments/totals', [\App\Http\Controllers\PaymentController::class, 'getTotals'])->name('admin.payments.totals');
 Route::get('/admin/bookings', [BookingController::class, 'indexAdmin'])->name('admin.bookings');
 Route::get('/receipt/{id}', [BookingController::class, 'showReceipt'])->name('receipt.show');
 

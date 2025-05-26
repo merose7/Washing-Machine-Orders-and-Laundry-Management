@@ -31,7 +31,7 @@
                     <table id="notificationTable" class="table table-bordered table-striped">
                         <thead>
                             <tr>
-                                <th>Judul</th>
+                                <th>Notifikasi</th>
                                 <th>Pesan</th>
                                 <th>Tanggal</th>
                                 <th>Aksi</th>
@@ -40,7 +40,7 @@
                         <tbody>
                             @foreach ($notifications as $notification)
                                 @php
-                                    $isCashConfirm = $notification->title === 'Konfirmasi Pembayaran Cash';
+                                    $isCashConfirm = str_contains($notification->title, 'Cash Payment');
                                     $isUnread = !$notification->is_read;
                                     preg_match('/Booking ID (\d+)/', $notification->message, $matches);
                                     $bookingId = $matches[1] ?? null;
@@ -53,14 +53,59 @@
                                             {{ $notification->title ?? '-' }}
                                         @endif
                                     </td>
-                                    <td>{{ $notification->message ?? 'Isi notifikasi' }}</td>
+                                    <td>
+                                        {{ $notification->message ?? 'Isi notifikasi' }}
+                                        <br>
+                                        {{-- Debug info --}}
+                                        <small>Booking ID: {{ $bookingId }}</small><br>
+                                        <small>Notification Title: {{ $notification->title }}</small><br>
+                                        @php
+                                            $booking = \App\Models\Booking::find($bookingId);
+                                        @endphp
+                                        <small>Booking Payment Status: {{ $booking ? $booking->payment_status : 'Booking not found' }}</small>
+                                    </td>
                                     <td>{{ $notification->created_at->format('d M Y H:i') }}</td>
                                     <td>
-                                        @if($isCashConfirm && $isUnread && $bookingId)
-                                            <form method="POST" action="{{ route('admin.booking.confirmCashPayment', $bookingId) }}" class="d-inline-block">
-                                                @csrf
-                                                <button type="submit" class="btn btn-success btn-sm">Konfirmasi</button>
-                                            </form>
+                                        @if($isCashConfirm && $bookingId)
+                                            @if($booking && $booking->payment_status === 'paid')
+                                                <span class="badge badge-success">Sudah Bayar</span>
+                                            @else
+                                                <form method="POST" action="{{ route('admin.booking.confirmCashPayment', $bookingId) }}" class="d-inline-block">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-success btn-sm">Konfirmasi</button>
+                                                </form>
+
+
+                                                <!-- Modal -->
+                                                <div class="modal fade" id="editPaymentModal{{ $notification->id }}" tabindex="-1" role="dialog" aria-labelledby="editPaymentModalLabel{{ $notification->id }}" aria-hidden="true">
+                                                  <div class="modal-dialog" role="document">
+                                                    <div class="modal-content">
+                                                      <form method="POST" action="{{ route('admin.notifications.cash.edit', $notification->id) }}">
+                                                        @csrf
+                                                        <div class="modal-header">
+                                                          <h5 class="modal-title" id="editPaymentModalLabel{{ $notification->id }}">Edit Status Pembayaran Cash</h5>
+                                                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                          </button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                          <div class="form-group">
+                                                            <label for="payment_status">Status Pembayaran</label>
+                                                            <select class="form-control" id="payment_status" name="payment_status" required>
+                                                              <option value="paid">Sudah Bayar</option>
+                                                              <option value="unpaid">Belum Bayar</option>
+                                                            </select>
+                                                          </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                          <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                                                          <button type="submit" class="btn btn-primary">Simpan</button>
+                                                        </div>
+                                                      </form>
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                            @endif
                                         @endif
 
                                         <form method="POST" action="{{ route('admin.notifications.destroy', $notification->id) }}"

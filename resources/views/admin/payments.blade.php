@@ -10,9 +10,9 @@
 @section('content')
 <div class="row mb-4">
     <div class="col-lg-4 col-6">
-        <div class="small-box bg-success">
+<div class="small-box bg-success">
             <div class="inner">
-                <h3>Rp {{ number_format($totalCashPayments, 0, ',', '.') }}</h3>
+                <h3 id="totalCashPayments">Rp {{ number_format($totalCashPayments, 0, ',', '.') }}</h3>
                 <p>Total Pembayaran Cash</p>
             </div>
             <div class="icon">
@@ -32,9 +32,9 @@
         </div>
     </div>
     <div class="col-lg-4 col-12">
-        <div class="small-box bg-warning">
+<div class="small-box bg-warning">
             <div class="inner">
-                <h3>Rp {{ number_format($totalPayments, 0, ',', '.') }}</h3>
+                <h3 id="totalPayments">Rp {{ number_format($totalPayments, 0, ',', '.') }}</h3>
                 <p>Total Pemasukan</p>
             </div>
             <div class="icon">
@@ -60,18 +60,27 @@
                     <th>Status</th>
                 </tr>
             </thead>
-            <tbody>
+                <tbody>
                 @foreach($cashPayments as $payment)
                 <tr>
                     <td>{{ $payment->id }}</td>
                     <td>{{ $payment->booking_id }}</td>
-                    <td>{{ $payment->customer_name ?? '-' }}</td>
-                    <td>{{ number_format($payment->amount, 0, ',', '.') }}</td>
+                    <td>
+                        @if($payment->customer_name)
+                            {{ $payment->customer_name }}
+                        @else
+                            @php
+                                $booking = \App\Models\Booking::find($payment->booking_id);
+                            @endphp
+                            {{ $booking ? $booking->customer_name : '-' }}
+                        @endif
+                    </td>
+                    <td>10,000</td>
                     <td>{{ $payment->created_at->format('d-m-Y H:i') }}</td>
                     <td>{{ ucfirst($payment->status) }}</td>
                 </tr>
                 @endforeach
-            </tbody>
+                </tbody>
         </table>
     </div>
 </div>
@@ -144,6 +153,17 @@ document.addEventListener('DOMContentLoaded', function () {
             infoFiltered: "(difilter dari _MAX_ total entri)"
         }
     });
+
+    // Polling to update totals every 30 seconds
+    setInterval(function() {
+        fetch("{{ route('admin.payments.totals') }}")
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('totalCashPayments').textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(data.totalCashPayments);
+                document.getElementById('totalPayments').textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(data.totalPayments);
+            })
+            .catch(error => console.error('Error fetching payment totals:', error));
+    }, 30000);
 });
 </script>
 @endpush
