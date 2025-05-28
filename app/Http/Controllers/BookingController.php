@@ -123,46 +123,56 @@ class BookingController extends Controller
 
             Log::info("Transaction status: $transactionStatus, Payment type: $paymentType, Fraud status: $fraudStatus");
 
-            if ($transactionStatus == 'capture') {
-                if ($paymentType == 'credit_card') {
-                    if ($fraudStatus == 'challenge') {
-                        $booking->payment_status = 'challenge';
-                    } else {
-                        $booking->payment_status = 'paid';
-                    }
+        if ($transactionStatus == 'capture') {
+            if ($paymentType == 'credit_card') {
+                if ($fraudStatus == 'challenge') {
+                    $booking->payment_status = 'challenge';
+                } else {
+                    $booking->payment_status = 'paid';
                 }
-            } elseif ($transactionStatus == 'settlement') {
-                $booking->payment_status = 'paid';
-            } elseif ($transactionStatus == 'pending') {
-                $booking->payment_status = 'pending';
-            } elseif ($transactionStatus == 'deny') {
-                $booking->payment_status = 'deny';
-            } elseif ($transactionStatus == 'expire') {
-                $booking->payment_status = 'expire';
-            } elseif ($transactionStatus == 'cancel') {
-                $booking->payment_status = 'cancel';
-            } else {
-                Log::warning('Unhandled transaction status: ' . $transactionStatus);
             }
+        } elseif ($transactionStatus == 'settlement') {
+            $booking->payment_status = 'paid';
+        } elseif ($transactionStatus == 'pending') {
+            $booking->payment_status = 'pending';
+        } elseif ($transactionStatus == 'deny') {
+            $booking->payment_status = 'deny';
+        } elseif ($transactionStatus == 'expire') {
+            $booking->payment_status = 'expire';
+        } elseif ($transactionStatus == 'cancel') {
+            $booking->payment_status = 'cancel';
+        } else {
+            Log::warning('Unhandled transaction status: ' . $transactionStatus);
+        }
 
-            $booking->save();
+        $booking->save();
 
-            // Create or update Payment record when payment is successful
-            if (in_array($booking->payment_status, ['paid', 'success'])) {
-                $amount = $booking->machine ? $booking->machine->price : 10000;
-                \App\Models\Payment::updateOrCreate(
-                    ['booking_id' => $booking->id],
-                    [
-                        'amount' => $amount,
-                        'status' => $booking->payment_status,
-                        'payment_method' => $booking->payment_method,
-                    ]
-                );
+        // Update machine status to available when payment is successful
+        if (in_array($booking->payment_status, ['paid', 'success'])) {
+            $machine = $booking->machine;
+            if ($machine) {
+                $machine->status = 'available';
+                $machine->booking_ends_at = null;
+                $machine->save();
             }
+        }
 
-            Log::info('Booking payment status updated to: ' . $booking->payment_status);
+        // Create or update Payment record when payment is successful
+        if (in_array($booking->payment_status, ['paid', 'success'])) {
+            $amount = $booking->machine ? $booking->machine->price : 10000;
+            \App\Models\Payment::updateOrCreate(
+                ['booking_id' => $booking->id],
+                [
+                    'amount' => $amount,
+                    'status' => $booking->payment_status,
+                    'payment_method' => $booking->payment_method,
+                ]
+            );
+        }
 
-            return response()->json(['status' => 'success']);
+        Log::info('Booking payment status updated to: ' . $booking->payment_status);
+
+        return response()->json(['status' => 'success']);
         } catch (\Exception $e) {
             Log::error('Midtrans notification error: ' . $e->getMessage());
             return response()->json(['error' => 'Notification handling failed'], 500);
@@ -349,6 +359,14 @@ public function payment($id)
         $booking->status = 'confirmed';
         $booking->save();
 
+        // Update machine status to available when payment is confirmed
+        $machine = $booking->machine;
+        if ($machine) {
+            $machine->status = 'available';
+            $machine->booking_ends_at = null;
+            $machine->save();
+        }
+
         // Create or update Payment record for cash payment
         $amount = $booking->machine ? $booking->machine->price : 10000;
         $payment = \App\Models\Payment::updateOrCreate(
@@ -374,5 +392,24 @@ public function payment($id)
         ]);
 
         return redirect()->back()->with('success', 'Pembayaran cash telah dikonfirmasi.');
+    }
+
+    public function confirmReceipt($id)
+    {
+        $booking = Booking::findOrFail($id);
+
+        // Update machine status to available when receipt is confirmed
+        $machine = $booking->machine;
+        if ($machine) {
+            $machine->status = 'available';
+            $machine->booking_ends_at = null;
+            $machine->save();
+        }
+
+        // Optionally update booking status to completed
+        $booking->status = 'completed';
+        $booking->save();
+
+        return redirect()->back()->with('success', 'Terima kasih telah menerima struk. Status mesin telah diperbarui menjadi tersedia.');
     }
 }

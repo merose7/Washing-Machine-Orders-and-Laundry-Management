@@ -59,8 +59,12 @@ class PaymentController extends Controller
     public function index()
     {
         // Fetch payments separated by method
-        $cashPayments = \App\Models\Payment::where('payment_method', 'cash')->get();
-        $midtransPayments = \App\Models\Payment::where('payment_method', 'midtrans')->get();
+        $cashPayments = \App\Models\Payment::where('payment_method', 'cash')
+            ->where('status', 'paid')
+            ->get();
+        $midtransPayments = \App\Models\Payment::where('payment_method', 'midtrans')
+            ->where('status', 'paid')
+            ->get();
 
         // Calculate totals
         $totalCashPayments = $cashPayments->sum('amount');
@@ -78,8 +82,12 @@ class PaymentController extends Controller
 
     public function getTotals()
     {
-        $totalCashPayments = \App\Models\Payment::where('payment_method', 'cash')->sum('amount');
-        $totalMidtransPayments = \App\Models\Payment::where('payment_method', 'midtrans')->sum('amount');
+        $totalCashPayments = \App\Models\Payment::where('payment_method', 'cash')
+            ->where('status', 'paid')
+            ->sum('amount');
+        $totalMidtransPayments = \App\Models\Payment::where('payment_method', 'midtrans')
+            ->where('status', 'paid')
+            ->sum('amount');
         $totalPayments = $totalCashPayments + $totalMidtransPayments;
 
         return response()->json([
@@ -87,5 +95,15 @@ class PaymentController extends Controller
             'totalMidtransPayments' => $totalMidtransPayments,
             'totalPayments' => $totalPayments,
         ]);
+
+    }
+
+    public function getMidtransPayments()
+    {
+        $midtransPayments = \App\Models\Payment::where('payment_method', 'midtrans')
+            ->where('status', 'paid')
+            ->get();
+
+        return response()->json($midtransPayments);
     }
 }

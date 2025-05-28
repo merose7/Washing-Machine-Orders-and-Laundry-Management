@@ -138,7 +138,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    $('#midtransPaymentsTable').DataTable({
+    var midtransTable = $('#midtransPaymentsTable').DataTable({
         pagingType: 'simple_numbers',
         language: {
             search: "Cari:",
@@ -154,15 +154,36 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Polling to update totals every 30 seconds
+    // Polling to update totals and midtrans payments every 30 seconds
     setInterval(function() {
+        // Update totals
         fetch("{{ route('admin.payments.totals') }}")
             .then(response => response.json())
             .then(data => {
                 document.getElementById('totalCashPayments').textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(data.totalCashPayments);
+                document.getElementById('totalMidtransPayments').textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(data.totalMidtransPayments);
                 document.getElementById('totalPayments').textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(data.totalPayments);
             })
             .catch(error => console.error('Error fetching payment totals:', error));
+
+        // Update midtrans payments table
+        fetch("{{ route('admin.payments.midtrans') }}")
+            .then(response => response.json())
+            .then(data => {
+                midtransTable.clear();
+                data.forEach(function(payment) {
+                    midtransTable.row.add([
+                        payment.id,
+                        payment.booking_id,
+                        payment.customer_name || '-',
+                        new Intl.NumberFormat('id-ID').format(payment.amount),
+                        new Date(payment.created_at).toLocaleString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
+                        payment.status.charAt(0).toUpperCase() + payment.status.slice(1)
+                    ]);
+                });
+                midtransTable.draw();
+            })
+            .catch(error => console.error('Error fetching midtrans payments:', error));
     }, 30000);
 });
 </script>

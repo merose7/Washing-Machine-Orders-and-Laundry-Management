@@ -1,6 +1,13 @@
 @extends('layouts.app')
 
 @section('content')
+<style>
+@media print {
+    .no-print {
+        display: none !important;
+    }
+}
+</style>
 <div class="flex justify-center">
     <div class="bg-white w-full max-w-md p-6 border border-gray-300 font-mono text-sm">
         <div class="text-center mb-4">
@@ -12,24 +19,34 @@
 
         @include('booking._receipt_details')
 
-        <div class="text-center">
+        <div class="text-center mt-6">
             <p>Terima kasih telah menggunakan layanan kami.</p>
-            <p>-- Semoga Harimu Menyala ❤️‍🔥❤️‍🔥--</p>
+            <p>-- Semoga Harimu Menyala ❤️‍🔥❤️‍🔥 --</p>
         </div>
 
-        <div class="flex justify-center mt-4 space-x-2">
-    <!-- Tombol Cetak Struk -->
-    <button onclick="window.print()" class="bg-red-500 hover:bg-red-700 text-white px-4 py-2 rounded">
-        Cetak Struk
-    </button>
-    </div>
+        <div class="flex justify-center mt-6 space-x-2 no-print">
+            <!-- Tombol Cetak Struk -->
+            <button onclick="window.print()" class="bg-red-500 hover:bg-red-700 text-white px-4 py-2 rounded">
+                Cetak Struk
+            </button>
+        </div>
 
-    <div class="text-center mt-4">
-    <!-- Tombol Kembali ke Home -->
-    <a href="{{ route('customer.dashboard') }}" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded ">
-        Kembali ke Home
-    </a>
+        <div class="text-center mt-4 no-print">
+            <!-- Tombol Konfirmasi Terima Struk -->
+            <form method="POST" action="{{ route('booking.confirmReceipt', $booking->id) }}">
+                @csrf
+                <button type="submit" class="btn text-black">
+                    Konfirmasi Terima Struk
+                </button>
+            </form>
+        </div>
+
+        <div class="text-center mt-4 no-print">
+            <!-- Tombol Kembali ke Home -->
+            <a href="{{ route('customer.dashboard') }}" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded ">
+                Kembali ke Home
+            </a>
+        </div>
     </div>
-    
 </div>
 @endsection

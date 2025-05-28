@@ -10,12 +10,12 @@ use Midtrans\Snap;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\Admin\NotificationController;            
 
-// Root landing page with logo and login/register
+// landing page login/register
 Route::get('/', function () {
     return view('welcome');
 });
 
-// Manual Midtrans payment status check route
+// Manual Midtrans payment status
 Route::get('/booking/payment/status/{id}', [BookingController::class, 'checkPaymentStatus'])->name('booking.paymentStatus');
 
 // Halaman utama pelanggan
@@ -42,6 +42,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
 Route::middleware(['auth', 'customer'])->group(function () {
     Route::get('/laundryhome', [HomeController::class, 'index'])->name('customer.dashboard');
     Route::get('/booking', [BookingController::class, 'showBookingForm']);
+    Route::post('/booking/confirm-receipt/{id}', [BookingController::class, 'confirmReceipt'])->name('booking.confirmReceipt');
 });
 
 // Debug route to check user role
@@ -82,8 +83,9 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
 
 //midtrans payment token
 Route::post('/payment/token', [PaymentController::class, 'createSnapToken']);
-Route::get('/admin/payments', [PaymentController::class, 'index'])->name('admin.payments'); //payment history for admin
+Route::get('/admin/payments', [PaymentController::class, 'index'])->name('admin.payments'); 
 Route::get('/admin/payments/totals', [\App\Http\Controllers\PaymentController::class, 'getTotals'])->name('admin.payments.totals');
+Route::get('/admin/payments/midtrans', [\App\Http\Controllers\PaymentController::class, 'getMidtransPayments'])->name('admin.payments.midtrans');
 Route::get('/admin/bookings', [BookingController::class, 'indexAdmin'])->name('admin.bookings');
 Route::get('/receipt/{id}', [BookingController::class, 'showReceipt'])->name('receipt.show');
 
