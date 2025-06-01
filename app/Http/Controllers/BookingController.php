@@ -160,7 +160,9 @@ class BookingController extends Controller
         // Create or update Payment record when payment is successful
         if (in_array($booking->payment_status, ['paid', 'success'])) {
             $amount = $booking->machine ? $booking->machine->price : 10000;
-            \App\Models\Payment::updateOrCreate(
+            Log::info("Creating/updating Payment record for booking ID {$booking->id} with amount {$amount}, status {$booking->payment_status}, method {$booking->payment_method}");
+            Log::info("Booking payment_method value: " . var_export($booking->payment_method, true));
+            $payment = \App\Models\Payment::updateOrCreate(
                 ['booking_id' => $booking->id],
                 [
                     'amount' => $amount,
@@ -168,6 +170,7 @@ class BookingController extends Controller
                     'payment_method' => $booking->payment_method,
                 ]
             );
+            Log::info("Payment record created/updated: " . json_encode($payment));
         }
 
         Log::info('Booking payment status updated to: ' . $booking->payment_status);

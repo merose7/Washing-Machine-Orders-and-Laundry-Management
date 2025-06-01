@@ -106,7 +106,7 @@
                 <tr>
                     <td>{{ $payment->id }}</td>
                     <td>{{ $payment->booking_id }}</td>
-                    <td>{{ $payment->customer_name ?? '-' }}</td>
+                    <td>{{ $payment->booking ? $payment->booking->customer_name : '-' }}</td>
                     <td>{{ number_format($payment->amount, 0, ',', '.') }}</td>
                     <td>{{ $payment->created_at->format('d-m-Y H:i') }}</td>
                     <td>{{ ucfirst($payment->status) }}</td>

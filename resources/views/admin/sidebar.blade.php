@@ -61,6 +61,12 @@
             </a>
         </li>
         <li class="nav-item">
+            <a href="{{ url('admin/finance-report') }}" class="nav-link">
+                <i class="nav-icon fas fa-file-invoice-dollar"></i>
+                <p>Finance Report</p>
+            </a>
+        </li>
+        <li class="nav-item">
             <a href="{{ url('admin/notifications') }}" class="nav-link">
                 <i class="nav-icon fas fa-envelope"></i>
                 <p>Gmail Notifikasi</p>

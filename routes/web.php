@@ -84,6 +84,9 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
 //midtrans payment token
 Route::post('/payment/token', [PaymentController::class, 'createSnapToken']);
 Route::get('/admin/payments', [PaymentController::class, 'index'])->name('admin.payments'); 
+Route::get('/admin/finance-report', [PaymentController::class, 'financeReport'])->name('admin.financeReport');
+Route::get('/admin/finance-report/export-pdf', [PaymentController::class, 'exportPdf'])->name('admin.financeReport.exportPdf');
+Route::get('/admin/finance-report/export-excel', [PaymentController::class, 'exportExcel'])->name('admin.financeReport.exportExcel');
 Route::get('/admin/payments/totals', [\App\Http\Controllers\PaymentController::class, 'getTotals'])->name('admin.payments.totals');
 Route::get('/admin/payments/midtrans', [\App\Http\Controllers\PaymentController::class, 'getMidtransPayments'])->name('admin.payments.midtrans');
 Route::get('/admin/bookings', [BookingController::class, 'indexAdmin'])->name('admin.bookings');
@@ -112,4 +115,3 @@ Route::get('/api/get-snap-token', function () {
 });
 
 require __DIR__.'/auth.php';
-
