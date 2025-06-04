@@ -1,18 +1,18 @@
 @extends('layouts.admin')
 
-@section('title', 'Detail Total Pembayaran')
+@section('title', 'Detail Pemasukan')
 
 @section('content_header')
-    <h1>Detail Total Pembayaran</h1>
-    <p>Rincian pembayaran cash dan Midtrans beserta insight total pemasukan</p>
+    <h1>Detail Pemasukan Laundry The Daily Wash</h1>
+    <p>Tabel Pembayaran Cash dan Midtrans beserta total pemasukan</p>
 @stop
 
 @section('content')
 <div class="row mb-4">
-    <div class="col-lg-4 col-6">
-<div class="small-box bg-success">
+    <div class="col-lg-4 col-md-6 col-12">
+        <div class="small-box bg-success">
             <div class="inner">
-                <h3 id="totalCashPayments">Rp {{ number_format($totalCashPayments, 0, ',', '.') }}</h3>
+                <h3 id="totalCashPayments">Rp {{ number_format($totalCashPayments ?? 0, 0, ',', '.') }}</h3>
                 <p>Total Pembayaran Cash</p>
             </div>
             <div class="icon">
@@ -20,10 +20,10 @@
             </div>
         </div>
     </div>
-    <div class="col-lg-4 col-6">
+    <div class="col-lg-4 col-md-6 col-12">
         <div class="small-box bg-primary">
             <div class="inner">
-                <h3>Rp {{ number_format($totalMidtransPayments, 0, ',', '.') }}</h3>
+                <h3 id="totalMidtransPayments">Rp {{ number_format($totalMidtransPayments ?? 0, 0, ',', '.') }}</h3>
                 <p>Total Pembayaran Midtrans</p>
             </div>
             <div class="icon">
@@ -31,10 +31,10 @@
             </div>
         </div>
     </div>
-    <div class="col-lg-4 col-12">
-<div class="small-box bg-warning">
+    <div class="col-lg-4 col-md-12 col-12">
+        <div class="small-box bg-warning">
             <div class="inner">
-                <h3 id="totalPayments">Rp {{ number_format($totalPayments, 0, ',', '.') }}</h3>
+                <h3 id="totalPayments">Rp {{ number_format($totalPayments ?? 0, 0, ',', '.') }}</h3>
                 <p>Total Pemasukan</p>
             </div>
             <div class="icon">
@@ -60,27 +60,38 @@
                     <th>Status</th>
                 </tr>
             </thead>
-                <tbody>
+            <tbody>
                 @foreach($cashPayments as $payment)
                 <tr>
                     <td>{{ $payment->id }}</td>
                     <td>{{ $payment->booking_id }}</td>
-                    <td>
-                        @if($payment->customer_name)
-                            {{ $payment->customer_name }}
-                        @else
-                            @php
-                                $booking = \App\Models\Booking::find($payment->booking_id);
-                            @endphp
-                            {{ $booking ? $booking->customer_name : '-' }}
-                        @endif
-                    </td>
-                    <td>10,000</td>
+                    <td>{{ $payment->booking ? $payment->booking->customer_name : '-' }}</td>
+                    <td>Rp {{ number_format($payment->amount ?? 0, 0, ',', '.') }}</td>
                     <td>{{ $payment->created_at->format('d-m-Y H:i') }}</td>
-                    <td>{{ ucfirst($payment->status) }}</td>
+                <td>
+                    @php
+                        $status = $payment->status;
+                        $badgeClass = 'badge-secondary';
+                        if (in_array($status, ['paid', 'completed', 'success'])) {
+                            $badgeClass = 'badge-success';
+                        } elseif (in_array($status, ['pending'])) {
+                            $badgeClass = 'badge-warning';
+                        } elseif (in_array($status, ['failed', 'cancelled', 'unknown'])) {
+                            $badgeClass = 'badge-danger';
+                        }
+                    @endphp
+                    <span class="badge {{ $badgeClass }}">{{ ucfirst($status) }}</span>
+                </td>
                 </tr>
                 @endforeach
-                </tbody>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th colspan="3" class="text-end">Total Pembayaran Cash:</th>
+                    <th id="totalCashPaymentsFooter">Rp {{ number_format($totalCashPayments ?? 0, 0, ',', '.') }}</th>
+                    <th colspan="2"></th>
+                </tr>
+            </tfoot>
         </table>
     </div>
 </div>
@@ -93,26 +104,32 @@
         <table class="table table-bordered table-striped text-center align-middle" id="midtransPaymentsTable">
             <thead>
                 <tr>
-                    <th>ID Pembayaran</th>
-                    <th>Booking ID</th>
-                    <th>Customer</th>
-                    <th>Jumlah (Rp)</th>
-                    <th>Tanggal Pembayaran</th>
+                    <th>Nama Customer</th>
+                    <th>Mesin</th>
+                    <th>Waktu Booking</th>
                     <th>Status</th>
+                    <th>Status Pembayaran</th>
+                    <th>Total Pemasukan</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach($midtransPayments as $payment)
                 <tr>
-                    <td>{{ $payment->id }}</td>
-                    <td>{{ $payment->booking_id }}</td>
                     <td>{{ $payment->booking ? $payment->booking->customer_name : '-' }}</td>
-                    <td>{{ number_format($payment->amount, 0, ',', '.') }}</td>
-                    <td>{{ $payment->created_at->format('d-m-Y H:i') }}</td>
+                    <td>{{ $payment->booking && $payment->booking->machine ? $payment->booking->machine->name : '-' }}</td>
+                    <td>{{ $payment->booking ? $payment->booking->booking_time : '-' }}</td>
+                    <td>{{ $payment->booking ? ucfirst($payment->booking->status) : '-' }}</td>
                     <td>{{ ucfirst($payment->status) }}</td>
+                    <td>Rp {{ number_format($payment->amount ?? 0, 0, ',', '.') }}</td>
                 </tr>
                 @endforeach
             </tbody>
+            <tfoot>
+                <tr>
+                    <th colspan="5" class="text-end">Total Pembayaran Midtrans:</th>
+                    <th id="totalMidtransPaymentsFooter">Rp {{ number_format($totalMidtransPayments ?? 0, 0, ',', '.') }}</th>
+                </tr>
+            </tfoot>
         </table>
     </div>
 </div>
@@ -122,7 +139,7 @@
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    $('#cashPaymentsTable').DataTable({
+    var cashTable = $('#cashPaymentsTable').DataTable({
         pagingType: 'simple_numbers',
         language: {
             search: "Cari:",
@@ -135,10 +152,53 @@ document.addEventListener('DOMContentLoaded', function () {
             zeroRecords: "Tidak ditemukan data yang cocok",
             infoEmpty: "Tidak ada data",
             infoFiltered: "(difilter dari _MAX_ total entri)"
+        },
+        "footerCallback": function ( row, data, start, end, display ) {
+            var api = this.api();
+
+            // Remove the formatting to get integer data for summation
+            var intVal = function ( i ) {
+                return typeof i === 'string' ?
+                    i.replace(/[\Rp\s\.]/g, '')*1 :
+                    typeof i === 'number' ?
+                        i : 0;
+            };
+
+            // Total over all pages
+            var totalCash = api
+                .column( 3 )
+                .data()
+                .reduce( function (a, b) {
+                    return intVal(a) + intVal(b);
+                }, 0 );
+
+            // Total over this page
+            var pageTotalCash = api
+                .column( 3, { page: 'current'} )
+                .data()
+                .reduce( function (a, b) {
+                    return intVal(a) + intVal(b);
+                }, 0 );
+
+            // Update footer
+            $( api.column( 3 ).footer() ).html(
+                'Rp ' + totalCash.toLocaleString('id-ID')
+            );
+
+            // Update totalCashPayments box
+            $('#totalCashPayments').text('Rp ' + totalCash.toLocaleString('id-ID'));
+
+            // Update totalPayments box by adding midtrans total dynamically
+            var midtransTotal = midTable ? midTable.column(5).data().reduce(function(a,b){
+                return intVal(a) + intVal(b);
+            }, 0) : 0;
+
+            var totalPayments = totalCash + midtransTotal;
+            $('#totalPayments').text('Rp ' + totalPayments.toLocaleString('id-ID'));
         }
     });
 
-    var midtransTable = $('#midtransPaymentsTable').DataTable({
+    var midTable = $('#midtransPaymentsTable').DataTable({
         pagingType: 'simple_numbers',
         language: {
             search: "Cari:",
@@ -151,40 +211,50 @@ document.addEventListener('DOMContentLoaded', function () {
             zeroRecords: "Tidak ditemukan data yang cocok",
             infoEmpty: "Tidak ada data",
             infoFiltered: "(difilter dari _MAX_ total entri)"
+        },
+        "footerCallback": function ( row, data, start, end, display ) {
+            var api = this.api();
+
+            var intVal = function ( i ) {
+                return typeof i === 'string' ?
+                    i.replace(/[\Rp\s\.]/g, '')*1 :
+                    typeof i === 'number' ?
+                        i : 0;
+            };
+
+            // Total over all pages
+            var totalMidtrans = api
+                .column( 5 )
+                .data()
+                .reduce( function (a, b) {
+                    return intVal(a) + intVal(b);
+                }, 0 );
+
+            // Total over this page
+            var pageTotalMidtrans = api
+                .column( 5, { page: 'current'} )
+                .data()
+                .reduce( function (a, b) {
+                    return intVal(a) + intVal(b);
+                }, 0 );
+
+            // Update footer
+            $( api.column( 5 ).footer() ).html(
+                'Rp ' + totalMidtrans.toLocaleString('id-ID')
+            );
+
+            // Update totalMidtransPayments box
+            $('#totalMidtransPayments').text('Rp ' + totalMidtrans.toLocaleString('id-ID'));
+
+            // Update totalPayments box by adding cash total dynamically
+            var cashTotal = cashTable ? cashTable.column(3).data().reduce(function(a,b){
+                return intVal(a) + intVal(b);
+            }, 0) : 0;
+
+            var totalPayments = totalMidtrans + cashTotal;
+            $('#totalPayments').text('Rp ' + totalPayments.toLocaleString('id-ID'));
         }
     });
-
-    // Polling to update totals and midtrans payments every 30 seconds
-    setInterval(function() {
-        // Update totals
-        fetch("{{ route('admin.payments.totals') }}")
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('totalCashPayments').textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(data.totalCashPayments);
-                document.getElementById('totalMidtransPayments').textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(data.totalMidtransPayments);
-                document.getElementById('totalPayments').textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(data.totalPayments);
-            })
-            .catch(error => console.error('Error fetching payment totals:', error));
-
-        // Update midtrans payments table
-        fetch("{{ route('admin.payments.midtrans') }}")
-            .then(response => response.json())
-            .then(data => {
-                midtransTable.clear();
-                data.forEach(function(payment) {
-                    midtransTable.row.add([
-                        payment.id,
-                        payment.booking_id,
-                        payment.customer_name || '-',
-                        new Intl.NumberFormat('id-ID').format(payment.amount),
-                        new Date(payment.created_at).toLocaleString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
-                        payment.status.charAt(0).toUpperCase() + payment.status.slice(1)
-                    ]);
-                });
-                midtransTable.draw();
-            })
-            .catch(error => console.error('Error fetching midtrans payments:', error));
-    }, 30000);
 });
 </script>
 @endpush

@@ -15,32 +15,34 @@
     </a>
     </div>
 
-    <canvas id="financeChart" width="800" height="400"></canvas>
+<div style="width: 100%; max-width: 900px; margin: auto;">
+    <canvas id="financeChart" style="width: 100%; height: 400px;"></canvas>
+</div>
 
-    <table class="min-w-full bg-white border border-gray-300 mt-6">
-        <thead>
-            <tr>
-                <th class="py-2 px-4 border-b border-gray-300">Month</th>
-                <th class="py-2 px-4 border-b border-gray-300">Cash Income</th>
-                <th class="py-2 px-4 border-b border-gray-300">Midtrans Income</th>
-                <th class="py-2 px-4 border-b border-gray-300">Total Income</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse ($reportData as $row)
-            <tr>
-                <td class="py-2 px-4 border-b border-gray-300">{{ $row['month'] }}</td>
-                <td class="py-2 px-4 border-b border-gray-300">Rp {{ number_format($row['cash'], 0, ',', '.') }}</td>
-                <td class="py-2 px-4 border-b border-gray-300">Rp {{ number_format($row['midtrans'], 0, ',', '.') }}</td>
-                <td class="py-2 px-4 border-b border-gray-300 font-bold">Rp {{ number_format($row['total'], 0, ',', '.') }}</td>
-            </tr>
-            @empty
-            <tr>
-                <td colspan="4" class="py-4 text-center">No data available</td>
-            </tr>
-            @endforelse
-        </tbody>
-    </table>
+<table class="min-w-full bg-white border border-gray-300 mt-6">
+    <thead>
+        <tr>
+            <th class="py-2 px-4 border-b border-gray-300">Month</th>
+            <th class="py-2 px-4 border-b border-gray-300">Cash Income</th>
+            <th class="py-2 px-4 border-b border-gray-300">Midtrans Income</th>
+            <th class="py-2 px-4 border-b border-gray-300">Total Income</th>
+        </tr>
+    </thead>
+    <tbody>
+        @forelse ($reportData as $row)
+        <tr>
+            <td class="py-2 px-4 border-b border-gray-300">{{ $row['month'] }}</td>
+            <td class="py-2 px-4 border-b border-gray-300">Rp {{ number_format($row['cash'], 0, ',', '.') }}</td>
+            <td class="py-2 px-4 border-b border-gray-300">Rp {{ number_format($row['midtrans'], 0, ',', '.') }}</td>
+            <td class="py-2 px-4 border-b border-gray-300 font-bold">Rp {{ number_format($row['total'], 0, ',', '.') }}</td>
+        </tr>
+        @empty
+        <tr>
+            <td colspan="4" class="py-4 text-center">No data available</td>
+        </tr>
+        @endforelse
+    </tbody>
+</table>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -54,49 +56,51 @@
 
     const ctx = document.getElementById('financeChart').getContext('2d');
     const financeChart = new Chart(ctx, {
-        type: 'line',
+        type: 'bar',
         data: {
             labels: labels,
             datasets: [
                 {
                     label: 'Cash Income',
                     data: cashData,
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    fill: true,
-                    tension: 0.1
+                    backgroundColor: 'rgba(75, 192, 192, 0.7)',
+                    stack: 'Stack 0',
+                    maxBarThickness: 50,
                 },
                 {
                     label: 'Midtrans Income',
                     data: midtransData,
-                    borderColor: 'rgba(255, 159, 64, 1)',
-                    backgroundColor: 'rgba(255, 159, 64, 0.2)',
-                    fill: true,
-                    tension: 0.1
-                },
-                {
-                    label: 'Total Income',
-                    data: totalData,
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                    fill: true,
-                    tension: 0.1
+                    backgroundColor: 'rgba(255, 159, 64, 0.7)',
+                    stack: 'Stack 0',
+                    maxBarThickness: 50,
                 }
             ]
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             plugins: {
                 legend: {
                     position: 'top',
                 },
                 title: {
                     display: true,
-                    text: 'Monthly Booking Income'
+                    text: 'Monthly Booking Income (Stacked)'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.dataset.label + ': Rp ' + context.parsed.y.toLocaleString('id-ID');
+                        }
+                    }
                 }
             },
             scales: {
+                x: {
+                    stacked: true,
+                },
                 y: {
+                    stacked: true,
                     beginAtZero: true,
                     ticks: {
                         callback: function(value) {

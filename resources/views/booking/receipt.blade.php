@@ -19,6 +19,14 @@
 
         @include('booking._receipt_details')
 
+        <div class="text-center mt-4 no-print">
+            <!-- Check Status Button -->
+            <button id="check-status-button" class="bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded">
+                Check Status
+            </button>
+            <div id="status-message" style="margin-top: 10px; font-weight: bold;"></div>
+        </div>
+
         <div class="text-center mt-6">
             <p>Terima kasih telah menggunakan layanan kami.</p>
             <p>-- Semoga Harimu Menyala ❤️‍🔥❤️‍🔥 --</p>
@@ -49,4 +57,54 @@
         </div>
     </div>
 </div>
+
+<script>
+const baseUrl = "{{ url('') }}";
+const bookingId = {{ $booking->id }};
+const statusMessage = document.getElementById('status-message');
+const checkStatusButton = document.getElementById('check-status-button');
+
+function updatePaymentStatusDisplay(status) {
+    const statusParagraphs = document.querySelectorAll('p');
+    statusParagraphs.forEach(p => {
+        if (p.textContent.includes('Status Bayar')) {
+            p.textContent = "Status Bayar : " + status.charAt(0).toUpperCase() + status.slice(1);
+        }
+    });
+}
+
+function checkPaymentStatus() {
+    statusMessage.textContent = "Checking payment status...";
+    fetch(baseUrl + '/booking/payment/status/' + bookingId)
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                statusMessage.textContent = "Payment status: " + data.payment_status;
+                // Update the payment status display in receipt details
+                const statusText = (data.payment_status === 'paid' || data.payment_status === 'success') ? 'Paid' : data.payment_status.charAt(0).toUpperCase() + data.payment_status.slice(1);
+                updatePaymentStatusDisplay(statusText);
+                if (data.payment_status === 'paid' || data.payment_status === 'success') {
+                    alert("Pembayaran berhasil!");
+                    window.location.reload();
+                }
+            } else if (data.error) {
+                statusMessage.textContent = "Error: " + data.error;
+            } else {
+                statusMessage.textContent = "Unknown response from server.";
+            }
+        })
+        .catch(error => {
+            statusMessage.textContent = "Failed to check payment status.";
+        });
+}
+
+if (checkStatusButton) {
+    checkStatusButton.addEventListener('click', checkPaymentStatus);
+}
+
+// Optional: Poll payment status every 30 seconds
+setInterval(() => {
+    checkPaymentStatus();
+}, 30000);
+</script>
 @endsection

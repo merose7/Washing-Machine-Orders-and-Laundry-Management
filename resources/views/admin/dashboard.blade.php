@@ -53,8 +53,8 @@
     <div class="col-lg-3 col-6">
         <div class="small-box bg-warning">
             <div class="inner">
-                <h3>Rp {{ number_format($totalPayments, 0, ',', '.') }}</h3>
-                <p>Total Pembayaran</p>
+                <h3> Rp {{ number_format($totalCashPayments ?? 0, 0, ',', '.') }}</h3>
+                <p>Detail Pemasukan</p>
             </div>
             <div class="icon">
                 <i class="fas fa-money-bill-wave"></i>
@@ -133,18 +133,16 @@
                         <th>Nama Customer</th>
                         <th>Mesin</th>
                         <th>Waktu Booking</th>
-                        <th>Status</th>
-                        <th>Status Pembayaran</th>
+                        <th>Status Booking</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach(\App\Models\Booking::with('machine')->get() as $booking)
+                    @foreach($recentBookings as $booking)
                     <tr>
                         <td>{{ $booking->customer_name }}</td>
                         <td>{{ $booking->machine ? $booking->machine->name : '-' }}</td>
                         <td>{{ $booking->booking_time }}</td>
                         <td>{{ ucfirst($booking->status) }}</td>
-                        <td>{{ ucfirst($booking->payment_status) }}</td>
                     </tr>
                     @endforeach
                 </tbody>

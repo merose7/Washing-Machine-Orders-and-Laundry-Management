@@ -15,9 +15,14 @@ use Illuminate\Support\Facades\Route;
 */
 
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\MidtransController;
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
 Route::get('/midtrans/token/{id}', [BookingController::class, 'getMidtransToken']);
+
+Route::post('/midtrans/callback', [MidtransController::class, 'callback']);
+Route::post('/midtrans/webhook', [PaymentController::class, 'handleWebhook']);

@@ -43,6 +43,17 @@
                 <div class="error-message">{{ $message }}</div>
             @enderror
 
+            <!-- Role -->
+            <label for="role">{{ __('Role') }}</label>
+            <select id="role" name="role" required>
+                <option value="" disabled selected>Select your role</option>
+                <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
+                <option value="customer" {{ old('role') == 'customer' ? 'selected' : '' }}>Customer</option>
+            </select>
+            @error('role')
+                <div class="error-message">{{ $message }}</div>
+            @enderror
+
             <div class="actions">
                 <a href="{{ route('login') }}">{{ __('Already registered?') }}</a>
                 <button type="submit">{{ __('Register') }}</button>

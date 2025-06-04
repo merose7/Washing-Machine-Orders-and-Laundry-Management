@@ -331,7 +331,7 @@
     <!-- Copyright -->
     <div class="text-center p-3 footer-copyright">
         © 2025 Copyright:
-        <a class="footer-link" href="http://127.0.0.1:8000/laundryhome">The Daily Wash Indonesia.com</a>
+        <a class="footer-link" href="{{ url('/laundryhome') }}">The Daily Wash Indonesia.com</a>
     </div>
 </footer>
 

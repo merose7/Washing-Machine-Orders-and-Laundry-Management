@@ -17,6 +17,7 @@ Route::get('/', function () {
 
 // Manual Midtrans payment status
 Route::get('/booking/payment/status/{id}', [BookingController::class, 'checkPaymentStatus'])->name('booking.paymentStatus');
+Route::get('/admin/payments', [PaymentController::class, 'index'])->name('admin.payments');
 
 // Halaman utama pelanggan
 //Route::get('/laundryhome', [HomeController::class, 'index']);
@@ -69,7 +70,7 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->name('admin.')->group(fun
 });
 
 //Notification route cash payment
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'customer'])->group(function () {
     Route::post('/booking/confirm-cash/{id}', [\App\Http\Controllers\BookingController::class, 'confirmCashPayment'])->name('booking.confirmCashPayment');
 });
 
@@ -82,11 +83,16 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
 });
 
 //midtrans payment token
-Route::post('/payment/token', [PaymentController::class, 'createSnapToken']);
-Route::get('/admin/payments', [PaymentController::class, 'index'])->name('admin.payments'); 
+Route::middleware(['auth'])->group(function () {
+    Route::post('/payment/token', [PaymentController::class, 'createSnapToken']);
+});
+
+Route::post('/midtrans/webhook', [PaymentController::class, 'handleWebhook']);
+Route::get('/ad min/payments', [PaymentController::class, 'index'])->name('admin.payments'); 
 Route::get('/admin/finance-report', [PaymentController::class, 'financeReport'])->name('admin.financeReport');
 Route::get('/admin/finance-report/export-pdf', [PaymentController::class, 'exportPdf'])->name('admin.financeReport.exportPdf');
 Route::get('/admin/finance-report/export-excel', [PaymentController::class, 'exportExcel'])->name('admin.financeReport.exportExcel');
+Route::get('/admin/finance-report/daily', [PaymentController::class, 'financeReportDaily'])->name('admin.financeReport.daily');
 Route::get('/admin/payments/totals', [\App\Http\Controllers\PaymentController::class, 'getTotals'])->name('admin.payments.totals');
 Route::get('/admin/payments/midtrans', [\App\Http\Controllers\PaymentController::class, 'getMidtransPayments'])->name('admin.payments.midtrans');
 Route::get('/admin/bookings', [BookingController::class, 'indexAdmin'])->name('admin.bookings');

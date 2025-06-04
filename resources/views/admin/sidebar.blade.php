@@ -57,7 +57,7 @@
         <li class="nav-item">
             <a href="{{ url('admin/payments') }}" class="nav-link">
                 <i class="nav-icon fas fa-money-bill-wave"></i>
-                <p>Total Pembayaran</p>
+                <p>Detail Pemasukan</p>
             </a>
         </li>
         <li class="nav-item">

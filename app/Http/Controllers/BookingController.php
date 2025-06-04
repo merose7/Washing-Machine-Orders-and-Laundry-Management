@@ -27,6 +27,7 @@ class BookingController extends Controller
             return response()->json(['error' => 'Booking not found'], 404);
         }
 
+        // Use consistent order_id format without unique suffix
         $orderId = 'BOOKING-' . $booking->id;
 
         try {
@@ -37,38 +38,38 @@ class BookingController extends Controller
             $paymentType = $status->payment_type;
             $fraudStatus = $status->fraud_status ?? null;
 
-        if ($transactionStatus == 'capture') {
-            if ($paymentType == 'credit_card') {
-                if ($fraudStatus == 'challenge') {
-                    $booking->payment_status = 'challenge';
-                } else {
-                    $booking->payment_status = 'success';
+            if ($transactionStatus == 'capture') {
+                if ($paymentType == 'credit_card') {
+                    if ($fraudStatus == 'challenge') {
+                        $booking->payment_status = 'challenge';
+                    } else {
+                        $booking->payment_status = 'paid';
+                    }
                 }
+            } elseif ($transactionStatus == 'settlement') {
+                $booking->payment_status = 'paid';
+            } elseif ($transactionStatus == 'pending') {
+                $booking->payment_status = 'pending';
+            } elseif ($transactionStatus == 'deny') {
+                $booking->payment_status = 'deny';
+            } elseif ($transactionStatus == 'expire') {
+                $booking->payment_status = 'expire';
+            } elseif ($transactionStatus == 'cancel') {
+                $booking->payment_status = 'cancel';
             }
-        } elseif ($transactionStatus == 'settlement') {
-            $booking->payment_status = 'success';
-        } elseif ($transactionStatus == 'pending') {
-            $booking->payment_status = 'pending';
-        } elseif ($transactionStatus == 'deny') {
-            $booking->payment_status = 'deny';
-        } elseif ($transactionStatus == 'expire') {
-            $booking->payment_status = 'expire';
-        } elseif ($transactionStatus == 'cancel') {
-            $booking->payment_status = 'cancel';
-        }
 
-        // Create or update Payment record when payment is successful
-        if (in_array($booking->payment_status, ['success', 'paid'])) {
-            $amount = $booking->machine ? $booking->machine->price : 10000;
-            $payment = \App\Models\Payment::updateOrCreate(
-                ['booking_id' => $booking->id],
-                [
-                    'amount' => $amount,
-                    'status' => $booking->payment_status,
-                    'payment_method' => $booking->payment_method,
-                ]
-            );
-        }
+            // Create or update Payment record when payment is successful
+            if (in_array($booking->payment_status, ['paid'])) {
+                $amount = $booking->machine ? $booking->machine->price : 10000;
+                $payment = \App\Models\Payment::updateOrCreate(
+                    ['booking_id' => $booking->id],
+                    [
+                        'amount' => $amount,
+                        'status' => $booking->payment_status,
+                        'payment_method' => $booking->payment_method,
+                    ]
+                );
+            }
 
             $booking->save();
 
@@ -93,94 +94,6 @@ class BookingController extends Controller
         return view('admin.bookings', compact('bookings'));
     }
 
-    public function paymentNotification(Request $request)
-    {
-        \Midtrans\Config::$serverKey = config('midtrans.server_key');
-        \Midtrans\Config::$isProduction = config('midtrans.is_production');
-        \Midtrans\Config::$isSanitized = config('midtrans.is_sanitized');
-        \Midtrans\Config::$is3ds = config('midtrans.is_3ds');
-
-        try {
-            $notification = new \Midtrans\Notification();
-
-            Log::info('Midtrans notification received: ' . json_encode($notification));
-            Log::info('Full notification object: ' . print_r($notification, true));
-            Log::info('Request payload: ' . json_encode($request->all()));
-
-            $transactionStatus = $notification->transaction_status ?? 'undefined';
-            $paymentType = $notification->payment_type ?? 'undefined';
-            $orderId = $notification->order_id ?? 'undefined';
-            $fraudStatus = $notification->fraud_status ?? 'undefined';
-
-            // Extract booking id from order id
-            $bookingId = intval(str_replace('BOOKING-', '', $orderId));
-            $booking = \App\Models\Booking::find($bookingId);
-
-            if (!$booking) {
-                Log::error('Booking not found for Midtrans notification: ' . $orderId);
-                return response()->json(['error' => 'Booking not found'], 404);
-            }
-
-            Log::info("Transaction status: $transactionStatus, Payment type: $paymentType, Fraud status: $fraudStatus");
-
-        if ($transactionStatus == 'capture') {
-            if ($paymentType == 'credit_card') {
-                if ($fraudStatus == 'challenge') {
-                    $booking->payment_status = 'challenge';
-                } else {
-                    $booking->payment_status = 'paid';
-                }
-            }
-        } elseif ($transactionStatus == 'settlement') {
-            $booking->payment_status = 'paid';
-        } elseif ($transactionStatus == 'pending') {
-            $booking->payment_status = 'pending';
-        } elseif ($transactionStatus == 'deny') {
-            $booking->payment_status = 'deny';
-        } elseif ($transactionStatus == 'expire') {
-            $booking->payment_status = 'expire';
-        } elseif ($transactionStatus == 'cancel') {
-            $booking->payment_status = 'cancel';
-        } else {
-            Log::warning('Unhandled transaction status: ' . $transactionStatus);
-        }
-
-        $booking->save();
-
-        // Update machine status to available when payment is successful
-        if (in_array($booking->payment_status, ['paid', 'success'])) {
-            $machine = $booking->machine;
-            if ($machine) {
-                $machine->status = 'available';
-                $machine->booking_ends_at = null;
-                $machine->save();
-            }
-        }
-
-        // Create or update Payment record when payment is successful
-        if (in_array($booking->payment_status, ['paid', 'success'])) {
-            $amount = $booking->machine ? $booking->machine->price : 10000;
-            Log::info("Creating/updating Payment record for booking ID {$booking->id} with amount {$amount}, status {$booking->payment_status}, method {$booking->payment_method}");
-            Log::info("Booking payment_method value: " . var_export($booking->payment_method, true));
-            $payment = \App\Models\Payment::updateOrCreate(
-                ['booking_id' => $booking->id],
-                [
-                    'amount' => $amount,
-                    'status' => $booking->payment_status,
-                    'payment_method' => $booking->payment_method,
-                ]
-            );
-            Log::info("Payment record created/updated: " . json_encode($payment));
-        }
-
-        Log::info('Booking payment status updated to: ' . $booking->payment_status);
-
-        return response()->json(['status' => 'success']);
-        } catch (\Exception $e) {
-            Log::error('Midtrans notification error: ' . $e->getMessage());
-            return response()->json(['error' => 'Notification handling failed'], 500);
-        }
-    }
 
 
     public function create(Request $request)
@@ -197,13 +110,12 @@ class BookingController extends Controller
                 'machine_id' => 'required|exists:machines,id',
                 'booking_date' => 'required|date',
                 'booking_time' => 'required',
-                'booking_duration' => 'required|integer|min:1', // duration in minutes
                 'payment_method' => 'required|in:cash,midtrans',
             ]);
 
             // Combine booking_date and booking_time into a single datetime string
             $bookingStart = \Carbon\Carbon::parse($request->booking_date . ' ' . $request->booking_time . ':00');
-            $bookingEnd = $bookingStart->copy()->addMinutes($request->booking_duration);
+            $bookingEnd = $bookingStart->copy()->addMinutes(60); // Default 60 minutes duration
 
             Log::info('Booking start: ' . $bookingStart);
             Log::info('Booking end: ' . $bookingEnd);
@@ -225,7 +137,7 @@ class BookingController extends Controller
             $machine = \App\Models\Machine::find($request->machine_id);
             if ($machine) {
                 $machine->status = 'booked';
-                $machine->booking_ends_at = $bookingEnd; // set booking end time based on duration
+                $machine->booking_ends_at = $bookingEnd; // set booking end time based on default duration
                 $machine->save();
             }
 
@@ -265,16 +177,19 @@ public function payment($id)
         $booking = Booking::with('machine')->findOrFail($id);
 
         // Set Midtrans configuration
-        Config::$serverKey = config('services.midtrans.serverKey');
-        Config::$isProduction = config('services.midtrans.isProduction');
-        Config::$isSanitized = true;
-        Config::$is3ds = true;
+        Config::$serverKey = config('midtrans.server_key');
+        Config::$isProduction = config('midtrans.is_production');
+        Config::$isSanitized = config('midtrans.is_sanitized');
+        Config::$is3ds = config('midtrans.is_3ds');
 
         $grossAmount = $booking->machine ? $booking->machine->price : 10000;
 
+        // Use consistent order_id format without unique suffix
+        $orderId = 'BOOKING-' . $booking->id;
+
         $params = [
             'transaction_details' => [
-                'order_id' => 'BOOKING-' . $booking->id,
+                'order_id' => $orderId,
                 'gross_amount' => $grossAmount,
             ],
             'customer_details' => [
@@ -283,19 +198,27 @@ public function payment($id)
             ],
         ];
 
-        Log::info('Midtrans grossAmount: ' . $grossAmount);
-        Log::info('Midtrans orderId: BOOKING-' . $booking->id);
-        Log::info('Midtrans customer email: ' . auth()->user()->email);
+            Log::info('Midtrans grossAmount: ' . $grossAmount);
+            Log::info('Midtrans orderId: ' . $orderId);
+            Log::info('Midtrans customer email: ' . auth()->user()->email);
 
-        try {
-            $snapToken = Snap::getSnapToken($params);
-            Log::info('Midtrans snapToken generated: ' . $snapToken);
-            return response()->json(['token' => $snapToken]);
-        } catch (\Exception $e) {
-            Log::error('Midtrans Snap Token Error: ' . $e->getMessage());
-            return response()->json(['error' => 'Failed to get snap token'], 500);
+            try {
+                $snapToken = Snap::getSnapToken($params);
+
+                // Create or update Payment record with status 'pending'
+                \App\Models\Payment::updateOrCreate(
+                    ['booking_id' => $booking->id, 'payment_method' => 'midtrans'],
+                    ['amount' => $grossAmount, 'status' => 'pending']
+                );
+
+                Log::info('Midtrans snapToken generated: ' . $snapToken);
+                return response()->json(['token' => $snapToken, 'order_id' => $orderId]);
+            } catch (\Exception $e) {
+                Log::error('Midtrans Snap Token Error: ' . $e->getMessage());
+                Log::error('Midtrans Snap Token Trace: ' . $e->getTraceAsString());
+                return response()->json(['error' => 'Failed to get snap token'], 500);
+            }
         }
-    }
 
     private function sendNotification($booking, $message)
     {
@@ -351,10 +274,16 @@ public function payment($id)
         $booking = Booking::findOrFail($id);
 
         if ($booking->payment_method !== 'cash') {
+            if (request()->ajax()) {
+                return response()->json(['error' => 'Pembayaran bukan metode cash.'], 400);
+            }
             return redirect()->back()->with('error', 'Pembayaran bukan metode cash.');
         }
 
         if ($booking->payment_status === 'paid') {
+            if (request()->ajax()) {
+                return response()->json(['info' => 'Pembayaran cash sudah dikonfirmasi.']);
+            }
             return redirect()->back()->with('info', 'Pembayaran cash sudah dikonfirmasi.');
         }
 
@@ -393,6 +322,24 @@ public function payment($id)
             'payment_method' => 'cash',
             'is_read' => false,
         ]);
+
+        if (request()->ajax()) {
+            // Return updated totals
+            $totalCashPayments = \App\Models\Payment::where('payment_method', 'cash')
+                ->where('status', 'paid')
+                ->sum('amount');
+            $totalMidtransPayments = \App\Models\Payment::where('payment_method', 'midtrans')
+                ->whereIn('status', ['paid', 'pending', 'completed'])
+                ->sum('amount');
+            $totalPayments = $totalCashPayments + $totalMidtransPayments;
+
+            return response()->json([
+                'success' => 'Pembayaran cash telah dikonfirmasi.',
+                'totalCashPayments' => $totalCashPayments,
+                'totalMidtransPayments' => $totalMidtransPayments,
+                'totalPayments' => $totalPayments,
+            ]);
+        }
 
         return redirect()->back()->with('success', 'Pembayaran cash telah dikonfirmasi.');
     }

@@ -70,7 +70,7 @@
                                             @if($booking && $booking->payment_status === 'paid')
                                                 <span class="badge badge-success">Sudah Bayar</span>
                                             @else
-                                                <form method="POST" action="{{ route('admin.booking.confirmCashPayment', $bookingId) }}" class="d-inline-block">
+                                                <form method="POST" action="{{ route('admin.booking.confirmCashPayment', $bookingId) }}" class="d-inline-block confirm-cash-payment-form">
                                                     @csrf
                                                     <button type="submit" class="btn btn-success btn-sm">Konfirmasi</button>
                                                 </form>
@@ -168,6 +168,65 @@
                             form.submit();
                         }
                     });
+                });
+            });
+
+            // AJAX form submission for cash payment confirmation
+            $('.confirm-cash-payment-form').on('submit', function(e) {
+                e.preventDefault();
+                var form = $(this);
+                var url = form.attr('action');
+                var token = form.find('input[name="_token"]').val();
+
+                $.ajax({
+                    url: url,
+                    method: 'POST',
+                    data: {
+                        _token: token
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Berhasil',
+                                text: response.success,
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
+
+                            // Update totals on the page
+                            $('#totalCashPayments').text('Rp ' + new Intl.NumberFormat('id-ID').format(response.totalCashPayments));
+                            $('#totalPayments').text('Rp ' + new Intl.NumberFormat('id-ID').format(response.totalPayments));
+
+                            // Optionally disable the confirm button after success
+                            form.find('button[type="submit"]').prop('disabled', true).text('Sudah Bayar');
+                        } else if (response.info) {
+                            Swal.fire({
+                                icon: 'info',
+                                title: 'Info',
+                                text: response.info,
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
+                        } else if (response.error) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: response.error,
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
+                        }
+                    },
+                    error: function(xhr) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Terjadi kesalahan saat mengkonfirmasi pembayaran.',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                    }
                 });
             });
 

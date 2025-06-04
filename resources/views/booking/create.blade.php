@@ -25,8 +25,6 @@
 
         <input type="hidden" name="machine_id" value="{{ $machineId }}">
 
-        <!-- Removed unused name input field as customer_name is taken from Auth user -->
-
         <div class="row">
             <div class="col-md-6 mb-3">
             <label for="booking_date" class="form-label">Tanggal Booking</label>
@@ -35,10 +33,6 @@
         <div class="col-md-6 mb-3">
             <label for="booking_time" class="form-label">Waktu Booking</label>
             <input type="time" class="form-control" id="booking_time" name="booking_time" required>
-        </div>
-        <div class="col-md-6 mb-3">
-            <label for="booking_duration" class="form-label">Durasi Booking (menit)</label>
-            <input type="number" class="form-control" id="booking_duration" name="booking_duration" min="1" required>
         </div>
 </div>
 
@@ -51,9 +45,10 @@ document.addEventListener('DOMContentLoaded', function () {
     // Helper padding function
     const pad = (n) => n.toString().padStart(2, '0');
 
-    // Set minimum date to today
+    // Set minimum and maximum date to today to disable future dates
     const todayStr = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
     dateInput.min = todayStr;
+    dateInput.max = todayStr;
 
     // Update time input min/max based on selected date
     const updateTimeLimits = () => {
@@ -66,7 +61,7 @@ document.addEventListener('DOMContentLoaded', function () {
             timeInput.min = minTime;
             timeInput.max = '23:59';
         } else {
-            // Any future date, allow full day
+            // No other date possible, but fallback to full day
             timeInput.min = '00:00';
             timeInput.max = '23:59';
         }

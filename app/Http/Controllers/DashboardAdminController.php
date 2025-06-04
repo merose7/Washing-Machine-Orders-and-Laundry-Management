@@ -17,7 +17,16 @@ class DashboardAdminController extends Controller
         $totalPayments = Payment::sum('amount'); // sum of payment amounts
         $totalNotifications = Notification::count(); // asumsi ada model Notification
 
-        $recentBookings = Booking::orderBy('created_at', 'desc')->take(10)->get();
+        $totalCashPayments = Payment::where('payment_method', 'cash')
+            ->where('status', 'paid')
+            ->sum('amount');
+
+        // Fetch recent bookings with payment relation eager loaded
+        $recentBookings = Booking::with(['machine', 'payment'])
+            ->orderBy('created_at', 'desc')
+            ->take(10)
+            ->get();
+
         $recentNotifications = Notification::orderBy('created_at', 'desc')->take(10)->get();
 
         $recentGmailNotifications = Notification::where('payment_method', '!=', 'cash')
@@ -25,9 +34,18 @@ class DashboardAdminController extends Controller
             ->take(10)
             ->get();
 
+        $midtransBookings = Booking::with('machine')
+            ->where('payment_method', 'midtrans')
+            ->get();
+
+        $totalMidtransPayments = Payment::where('payment_method', 'midtrans')->sum('amount');
+        $totalMidtransBookings = Booking::where('payment_method', 'midtrans')->count();
+
         return view('admin.dashboard', compact(
             'totalMachines', 'totalBookings', 'totalPayments', 'totalNotifications',
-            'recentBookings', 'recentNotifications', 'recentGmailNotifications'
+            'totalCashPayments',
+            'recentBookings', 'recentNotifications', 'recentGmailNotifications',
+            'midtransBookings', 'totalMidtransPayments', 'totalMidtransBookings'
         ));
     }
 }

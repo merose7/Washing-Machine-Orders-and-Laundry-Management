@@ -4,7 +4,8 @@
 <div class="container mt-4">
     <div class="card shadow-sm">
         <div class="card-header">
-            <h1 class="mb-0">Notifikasi Gmail</h1>
+            <h1 class="mb-0">Gmail Notifikasi</h1>
+            <p>Gmail Notifikasi yang Terkirim</p>
         </div>
         <div class="card-body">
 
