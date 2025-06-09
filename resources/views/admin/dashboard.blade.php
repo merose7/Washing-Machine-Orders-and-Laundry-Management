@@ -53,7 +53,7 @@
     <div class="col-lg-3 col-6">
         <div class="small-box bg-warning">
             <div class="inner">
-                <h3> Rp {{ number_format($totalCashPayments ?? 0, 0, ',', '.') }}</h3>
+                <h3> Rp </h3>
                 <p>Detail Pemasukan</p>
             </div>
             <div class="icon">

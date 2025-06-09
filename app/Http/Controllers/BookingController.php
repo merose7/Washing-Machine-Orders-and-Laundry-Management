@@ -169,7 +169,35 @@ public function payment($id)
     {
         $booking = Booking::with('machine')->findOrFail($id);
         $machinePrice = $booking->machine ? $booking->machine->price : null;
-        return view('booking.receipt', compact('booking', 'machinePrice'));
+
+        // Generate Midtrans snap token
+        \Midtrans\Config::$serverKey = config('midtrans.server_key');
+        \Midtrans\Config::$isProduction = config('midtrans.is_production');
+        \Midtrans\Config::$isSanitized = config('midtrans.is_sanitized');
+        \Midtrans\Config::$is3ds = config('midtrans.is_3ds');
+
+        $grossAmount = $machinePrice ?? 10000;
+        $orderId = 'BOOKING-' . $booking->id;
+
+        $params = [
+            'transaction_details' => [
+                'order_id' => $orderId,
+                'gross_amount' => $grossAmount,
+            ],
+            'customer_details' => [
+                'first_name' => $booking->customer_name,
+                'email' => auth()->user()->email,
+            ],
+        ];
+
+        try {
+            $snapToken = \Midtrans\Snap::getSnapToken($params);
+        } catch (\Exception $e) {
+            \Log::error('Midtrans Snap Token Error in receipt: ' . $e->getMessage());
+            $snapToken = null;
+        }
+
+        return view('booking.receipt', compact('booking', 'machinePrice', 'snapToken'));
     }
 
     public function getMidtransToken($id)

@@ -6,11 +6,9 @@ use Illuminate\Http\Request;
 use Midtrans\Snap;
 use Midtrans\Transaction;
 use Midtrans\Config;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Log as LogFacade;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
-
-use Illuminate\Support\Facades\Log as LogFacade;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\FinanceReportExport;
@@ -45,7 +43,6 @@ class PaymentController extends Controller
             ->limit(10)
             ->get();
 
-        // Remove recentBookings and use midtransPayments for midtrans payment table
 
         // Debug: Log cash payments count and total amount
         \Log::info('Cash payments count: ' . $cashPayments->count());
@@ -420,6 +417,8 @@ if ($validator->fails()) {
             return response('Payment not found', 404);
         }
 
+        LogFacade::info("Midtrans webhook transaction_status: {$transactionStatus}, current payment status: {$payment->status}");
+
         // Map Midtrans transaction status to local payment status
         $statusMap = [
             'capture' => 'paid',
@@ -432,8 +431,8 @@ if ($validator->fails()) {
 
         $newStatus = $statusMap[$transactionStatus] ?? 'unpaid';
 
-        // Update payment status if changed
         if ($payment->status !== $newStatus) {
+            LogFacade::info("Updating payment status from {$payment->status} to {$newStatus} for booking_id {$bookingId}");
             $payment->status = $newStatus;
             $payment->save();
 
@@ -454,6 +453,8 @@ if ($validator->fails()) {
                     }
                 }
             }
+        } else {
+            LogFacade::info("Payment status for booking_id {$bookingId} is already {$payment->status}, no update needed.");
         }
 
         return response('OK', 200);
