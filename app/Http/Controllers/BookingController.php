@@ -5,10 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
 use App\Models\Booking;
 use App\Mail\BookingConfirmation;
 use App\Models\Notification;
-use Illuminate\Support\Facades\Log;
 use Midtrans\Config;
 use Midtrans\Snap;
 
@@ -151,7 +151,7 @@ class BookingController extends Controller
 
             return redirect()->route('booking.receipt', $booking->id);
         } catch (\Exception $e) {
-            \Log::error('Booking store error: ' . $e->getMessage());
+            Log::error('Booking store error: ' . $e->getMessage());
             return redirect()->back()->withErrors(['error' => 'Terjadi kesalahan saat memproses booking. Silakan coba lagi.']);
         }
     }
@@ -176,8 +176,11 @@ public function payment($id)
         \Midtrans\Config::$isSanitized = config('midtrans.is_sanitized');
         \Midtrans\Config::$is3ds = config('midtrans.is_3ds');
 
-        $grossAmount = $machinePrice ?? 10000;
-        $orderId = 'BOOKING-' . $booking->id;
+        $grossAmount = $machinePrice;
+        if (!$grossAmount || $grossAmount < 0.01) {
+            $grossAmount = 10000;
+        }
+        $orderId = 'BOOKING-' . $booking->id . '-' . time();
 
         $params = [
             'transaction_details' => [
@@ -193,7 +196,7 @@ public function payment($id)
         try {
             $snapToken = \Midtrans\Snap::getSnapToken($params);
         } catch (\Exception $e) {
-            \Log::error('Midtrans Snap Token Error in receipt: ' . $e->getMessage());
+            Log::error('Midtrans Snap Token Error in receipt: ' . $e->getMessage());
             $snapToken = null;
         }
 
@@ -212,8 +215,8 @@ public function payment($id)
 
         $grossAmount = $booking->machine ? $booking->machine->price : 10000;
 
-        // Use consistent order_id format without unique suffix
-        $orderId = 'BOOKING-' . $booking->id;
+        // Use unique order_id format with timestamp suffix to avoid duplicates
+        $orderId = 'BOOKING-' . $booking->id . '-' . time();
 
         $params = [
             'transaction_details' => [

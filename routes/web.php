@@ -9,6 +9,9 @@ use Illuminate\Support\Facades\Route;
 use Midtrans\Snap;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\Admin\NotificationController;            
+use App\Http\Controllers\MidtransController;
+use Illuminate\Support\Facades\Log;
+
 
 // landing page login/register
 Route::get('/', function () {
@@ -103,6 +106,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/midtrans-payment/{id}', [BookingController::class, 'midtransPayment'])->name('booking.midtrans');
     Route::get('/receipt/{id}', [BookingController::class, 'receipt'])->name('booking.receipt');
 });
+
+// Midtrans callback route
+Route::post('/midtrans/callback', [MidtransController::class, 'callback']);
 
 Route::get('/api/get-snap-token', function () {
     \Midtrans\Config::$serverKey = env('MIDTRANS_SERVER_KEY');

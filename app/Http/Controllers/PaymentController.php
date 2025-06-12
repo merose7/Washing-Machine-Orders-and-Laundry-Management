@@ -108,17 +108,17 @@ if ($validator->fails()) {
             $grossAmount = 10000;
         }
 
-        $params = [
-            'transaction_details' => [
-                'order_id' => 'BOOKING-' . $booking->id,
-                'gross_amount' => $grossAmount,
-            ],
-            'customer_details' => [
-                'first_name' => $booking->customer_name,
-                'email' => $request->email,
-                'phone' => $request->phone ?? '',
-            ],
-        ];
+$params = [
+    'transaction_details' => [
+        'order_id' => 'BOOKING-' . $booking->id . '-' . time(),
+        'gross_amount' => $grossAmount,
+    ],
+    'customer_details' => [
+        'first_name' => $booking->customer_name,
+        'email' => $request->email,
+        'phone' => $request->phone ?? '',
+    ],
+];
 
         LogFacade::info('Midtrans Snap Token Request Params: ' . json_encode($params));
 
