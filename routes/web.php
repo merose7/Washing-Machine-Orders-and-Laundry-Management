@@ -107,7 +107,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/receipt/{id}', [BookingController::class, 'receipt'])->name('booking.receipt');
 });
 
-// Midtrans callback route
 Route::post('/midtrans/callback', [MidtransController::class, 'callback']);
 
 Route::get('/api/get-snap-token', function () {

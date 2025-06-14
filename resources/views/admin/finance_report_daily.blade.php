@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="container mx-auto px-4 py-6">
-    <h1 class="text-2xl font-bold mb-4">Finance Report - Daily Booking Income for {{ $selectedMonth }}</h1>
+    <h1 class="text-2xl font-bold mb-4">Laporan Keuangan - Pemasukan Booking Bulan {{ $selectedMonth }}</h1>
 
     <form method="GET" action="{{ route('admin.financeReport.daily') }}" class="mb-4">
         <label for="month" class="mr-2 font-semibold">Select Month:</label>

@@ -43,7 +43,6 @@
         </div>
     </div>
 </div>
-
 <div class="card mb-4">
     <div class="card-header">
         <h3 class="card-title">Pembayaran Cash</h3>
@@ -53,10 +52,10 @@
             <thead>
                 <tr>
                     <th>ID Pembayaran</th>
-                    <th>Booking ID</th>
-                    <th>Customer</th>
+                    <th>Mesin ID</th>
+                    <th>Nama Customer</th>
                     <th>Jumlah (Rp)</th>
-                    <th>Tanggal Pembayaran</th>
+                    <th>Waktu Booking</th>
                     <th>Status</th>
                 </tr>
             </thead>
@@ -64,24 +63,24 @@
                 @foreach($cashPayments as $payment)
                 <tr>
                     <td>{{ $payment->id }}</td>
-                    <td>{{ $payment->booking_id }}</td>
+                    <td>{{ $payment->booking && $payment->booking->machine ? $payment->booking->machine->name : '-' }}</td>
                     <td>{{ $payment->booking ? $payment->booking->customer_name : '-' }}</td>
                     <td>Rp {{ number_format($payment->amount ?? 0, 0, ',', '.') }}</td>
-                    <td>{{ $payment->created_at->format('d-m-Y H:i') }}</td>
-                <td>
-                    @php
-                        $status = $payment->status;
-                        $badgeClass = 'badge-secondary';
-                        if (in_array($status, ['paid', 'completed', 'success'])) {
-                            $badgeClass = 'badge-success';
-                        } elseif (in_array($status, ['pending'])) {
-                            $badgeClass = 'badge-warning';
-                        } elseif (in_array($status, ['failed', 'cancelled', 'unknown'])) {
-                            $badgeClass = 'badge-danger';
-                        }
-                    @endphp
-                    <span class="badge {{ $badgeClass }}">{{ ucfirst($status) }}</span>
-                </td>
+                    <td>{{ $payment->booking ? $payment->booking->booking_time : '-' }}</td>
+                    <td>
+                        @php
+                            $status = $payment->status;
+                            $badgeClass = 'badge-secondary';
+                            if (in_array($status, ['paid', 'completed', 'success'])) {
+                                $badgeClass = 'badge-success';
+                            } elseif ($status === 'pending') {
+                                $badgeClass = 'badge-warning';
+                            } elseif (in_array($status, ['failed', 'cancelled', 'unknown'])) {
+                                $badgeClass = 'badge-danger';
+                            }
+                        @endphp
+                        <span class="badge {{ $badgeClass }}">{{ ucfirst($status) }}</span>
+                    </td>
                 </tr>
                 @endforeach
             </tbody>
@@ -104,22 +103,22 @@
         <table class="table table-bordered table-striped text-center align-middle" id="midtransPaymentsTable">
             <thead>
                 <tr>
+                    <th>ID Pembayaran</th>                    
+                    <th>Mesin ID</th>
                     <th>Nama Customer</th>
-                    <th>Mesin</th>
                     <th>Waktu Booking</th>
                     <th>Status</th>
-                    <th>Status Pembayaran</th>
                     <th>Total Pemasukan</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach($midtransPayments as $payment)
                 <tr>
-                    <td>{{ $payment->booking ? $payment->booking->customer_name : '-' }}</td>
+                    <td>{{ $payment->id }}</td>
                     <td>{{ $payment->booking && $payment->booking->machine ? $payment->booking->machine->name : '-' }}</td>
+                    <td>{{ $payment->booking ? $payment->booking->customer_name : '-' }}</td>
                     <td>{{ $payment->booking ? $payment->booking->booking_time : '-' }}</td>
                     <td>{{ $payment->booking ? ucfirst($payment->booking->status) : '-' }}</td>
-                    <td>{{ ucfirst($payment->status) }}</td>
                     <td>Rp {{ number_format($payment->amount ?? 0, 0, ',', '.') }}</td>
                 </tr>
                 @endforeach

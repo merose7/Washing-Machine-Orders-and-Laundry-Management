@@ -12,11 +12,11 @@
     </style>
 </head>
 <body>
-    <h1>Finance Report - Monthly Booking Income</h1>
+    <h1>Laporan Keuangan - Pemasukan Booking Bulanan</h1>
     <table>
         <thead>
             <tr>
-                <th>Month</th>
+                <th>Bulan</th>
                 <th>Cash Income</th>
                 <th>Midtrans Income</th>
                 <th>Total Income</th>

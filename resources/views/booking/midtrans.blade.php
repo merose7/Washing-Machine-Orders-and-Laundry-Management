@@ -62,10 +62,13 @@
 
 <script>
 const baseUrl = "{{ url('') }}";
-
+//tambahan untuk pembayaran koneksi antar server mistrans
 const payButton = document.getElementById("pay-button");
 if (payButton) {
     payButton.addEventListener("click", function() {
+        payButton.disabled = true;
+        payButton.textContent = "Memproses...";
+
         fetch(baseUrl + '/payment/token', {
             method: 'POST',
             headers: {
@@ -92,22 +95,30 @@ if (payButton) {
         .then(data => {
             window.snap.pay(data.snap_token, {
                 onSuccess: function(result){
+                    alert("Pembayaran berhasil!");
                     window.location.href = "{{ route('booking.receipt', $booking->id) }}";
                 },
                 onPending: function(result){
+                    alert("Pembayaran dalam proses, silakan cek kembali nanti.");
                     window.location.href = "{{ route('booking.receipt', $booking->id) }}";
                 },
                 onError: function(result){ 
                     alert("Terjadi kesalahan saat proses pembayaran. Silakan coba lagi.");
+                    payButton.disabled = false;
+                    payButton.textContent = "Bayar Sekarang";
                 },
                 onClose: function(){ 
                     alert("Popup ditutup tanpa transaksi."); 
+                    payButton.disabled = false;
+                    payButton.textContent = "Bayar Sekarang";
                 }
             });
         })
         .catch(error => {
             console.error('Fetch error:', error);
             alert("Gagal mendapatkan token pembayaran. Silakan coba lagi.");
+            payButton.disabled = false;
+            payButton.textContent = "Bayar Sekarang";
         });
     });
 }
@@ -144,10 +155,10 @@ function checkPaymentStatus() {
         })
         .catch(error => {
             statusMessage.textContent = "Failed to check payment status.";
-        });
+        }); 
 }
 
-// Add a "Check Status" button below the pay button
+// Add a "Check Status" button
 const checkStatusButton = document.createElement('button');
 checkStatusButton.textContent = "Check Status";
 checkStatusButton.className = "bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded no-print";
@@ -158,7 +169,6 @@ if (payButton) {
     checkStatusButton.addEventListener('click', checkPaymentStatus);
 }
 
-// Optional: Poll payment status every 30 seconds
 setInterval(() => {
     checkPaymentStatus();
 }, 30000);

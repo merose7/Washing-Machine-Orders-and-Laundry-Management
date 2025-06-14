@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="container mx-auto px-4 py-6">
-    <h1 class="text-2xl font-bold mb-4">Finance Report - Monthly Booking Income</h1>
+    <h1 class="text-2xl font-bold mb-4">Laporan Keuangan - Pemasukan Booking Bulanan</h1>
 
     <div class="mb-4">
     <a href="{{ route('admin.financeReport.exportPdf') }}" class="btn btn-danger me-2">
@@ -15,6 +15,21 @@
     </a>
     </div>
 
+  {{-- Form Pemilihan Bulan --}}
+    <form class="flex flex-col sm:flex-row sm:items-center gap-2 mb-4" method="GET" action="{{ route('admin.financeReport') }}">
+        <label for="month" class="text-gray-700">Pilih Bulan:</label>
+        <select name="month" id="month" class="form-select px-3 py-2 border rounded shadow-sm">
+            <option value="">-- Semua Bulan --</option>
+            @foreach($availableMonths as $month)
+                <option value="{{ $month }}" {{ request('month') == $month ? 'selected' : '' }}>
+                    {{ $month }}
+                </option>
+            @endforeach
+        </select>
+        <button type="submit" class="btn btn-primary">
+            Tampilkan
+        </button>
+    </form>
 <div style="width: 100%; max-width: 900px; margin: auto;">
     <canvas id="financeChart" style="width: 100%; height: 400px;"></canvas>
 </div>
@@ -22,7 +37,7 @@
 <table class="min-w-full bg-white border border-gray-300 mt-6">
     <thead>
         <tr>
-            <th class="py-2 px-4 border-b border-gray-300">Month</th>
+            <th class="py-2 px-4 border-b border-gray-300">Bulan</th>
             <th class="py-2 px-4 border-b border-gray-300">Cash Income</th>
             <th class="py-2 px-4 border-b border-gray-300">Midtrans Income</th>
             <th class="py-2 px-4 border-b border-gray-300">Total Income</th>

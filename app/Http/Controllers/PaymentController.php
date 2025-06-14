@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Midtrans\Snap;
 use Midtrans\Transaction;
 use Midtrans\Config;
-use Illuminate\Support\Facades\Log as LogFacade;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -18,13 +18,11 @@ class PaymentController extends Controller
 {
     public function index()
     {
-        // Fetch cash payments with status 'paid' with booking and machine eager loaded
         $cashPayments = \App\Models\Payment::with(['booking.machine'])
             ->where('payment_method', 'cash')
             ->where('status', 'paid')
             ->get();
 
-        // Override each cash payment amount to 10,000
         $cashPayments->each(function ($payment) {
             $payment->amount = 10000;
         });
@@ -213,7 +211,6 @@ $params = [
 
         $midtransResults = $midtransQuery->get();
 
-        // Transform results to structure: [month => cash_count or midtrans_total]
         $cashData = [];
         foreach ($cashResults as $row) {
             $month = is_array($row) ? $row['month'] : $row->month;
@@ -244,7 +241,11 @@ $params = [
             ];
         }
 
-        return view('admin.finance_report', compact('reportData', 'months', 'selectedMonths'));
+        // Define availableMonths for the view (sorted ascending)
+        $availableMonths = $months;
+        sort($availableMonths);
+
+        return view('admin.finance_report', compact('reportData', 'months', 'selectedMonths', 'availableMonths'));
     }
 
     public function financeReportDaily(Request $request)

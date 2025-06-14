@@ -27,7 +27,6 @@ class BookingController extends Controller
             return response()->json(['error' => 'Booking not found'], 404);
         }
 
-        // Use consistent order_id format without unique suffix
         $orderId = 'BOOKING-' . $booking->id;
 
         try {
@@ -115,7 +114,7 @@ class BookingController extends Controller
 
             // Combine booking_date and booking_time into a single datetime string
             $bookingStart = \Carbon\Carbon::parse($request->booking_date . ' ' . $request->booking_time . ':00');
-            $bookingEnd = $bookingStart->copy()->addMinutes(60); // Default 60 minutes duration
+            $bookingEnd = $bookingStart->copy()->addMinutes(60); // Default 60 minutes 
 
             Log::info('Booking start: ' . $bookingStart);
             Log::info('Booking end: ' . $bookingEnd);
@@ -137,11 +136,11 @@ class BookingController extends Controller
             $machine = \App\Models\Machine::find($request->machine_id);
             if ($machine) {
                 $machine->status = 'booked';
-                $machine->booking_ends_at = $bookingEnd; // set booking end time based on default duration
+                $machine->booking_ends_at = $bookingEnd; 
                 $machine->save();
             }
 
-            // Send notification after booking
+            // kirimnotif setelah booking
             $this->sendNotification($booking, 'Booking berhasil dibuat. Mesin Anda dijadwalkan pada ' . $booking->booking_time);
 
             // Kalau pakai Midtrans, redirect ke halaman pembayaran
@@ -156,14 +155,12 @@ class BookingController extends Controller
         }
     }
 
-public function payment($id)
+public function payment($id) 
 {
     $booking = Booking::with('machine')->findOrFail($id);
     $machinePrice = $booking->machine ? $booking->machine->price : null;
     return view('booking.midtrans', compact('booking', 'machinePrice'));
 }
-
-    // Remove duplicate paymentNotification method
 
     public function receipt($id)
     {
