@@ -21,13 +21,16 @@ class MachineController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required',
+            'name' => 'required|unique:machines,name',
             'status' => 'required|in:available,booked,maintenance'
+        ], [
+            'name.unique' => 'Nama mesin sudah ada.'
         ]);
+        
 
         Machine::create($request->only(['name', 'status']));
 
-        return redirect()->route('machines.index')->with('success', 'Machine berhasil ditambahkan');
+return redirect()->route('machines.index')->with('success', 'Data mesin berhasil disimpan.');
     }
 
     public function edit(Machine $machine)
@@ -38,8 +41,10 @@ class MachineController extends Controller
     public function update(Request $request, Machine $machine)
     {
         $request->validate([
-            'name' => 'required',
+            'name' => 'required|unique:machines,name,' . $machine->id,
             'status' => 'required|in:available,booked,maintenance'
+        ], [
+            'name.unique' => 'Nama mesin sudah ada, harap gunakan nama lain.'
         ]);
 
         $machine->update($request->all());
@@ -53,4 +58,3 @@ class MachineController extends Controller
         return redirect()->route('machines.index')->with('success', 'Machine berhasil dihapus');
     }
 }
-

@@ -1,11 +1,9 @@
 @extends('layouts.admin')
 
 @push('styles')
-    {{-- DataTables CSS --}}
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
 
     <style>
-        /* Table */
         #machinesTable td, #machinesTable th {
             padding: 10px;
             font-size: 14px;
@@ -49,8 +47,6 @@
 
 
         <div class="card-body">
-
-            {{-- Alert Success --}}
             @if(session('success'))
                 <div id="alert" class="alert alert-success alert-dismissible fade show" role="alert">
                     <strong>{{ session('success') }}</strong>
@@ -84,13 +80,6 @@
                                     <a href="{{ route('machines.edit', $machine->id) }}" class="btn btn-sm btn-warning">
                                         <i class="fas fa-edit"></i> Edit
                                     </a>
-                                    <form action="{{ route('machines.destroy', $machine->id) }}" method="POST" onsubmit="return confirm('Yakin ingin hapus?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button class="btn btn-sm btn-danger">
-                                            <i class="fas fa-trash-alt"></i> Hapus
-                                        </button>
-                                    </form>
                                 </div>
                             </td>
                         </tr>
@@ -104,7 +93,6 @@
 @endsection
 
 @push('scripts')
-    {{-- DataTables JS --}}
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 
@@ -132,6 +120,28 @@
                     alert.style.display = 'none';
                 }, 3000);
             }
+
+            // SweetAlert for Delete Confirmation
+            document.querySelectorAll('.delete-machine-btn').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const form = this.closest('.delete-machine-form');
+                    Swal.fire({
+                        title: 'Hapus Mesin?',
+                        text: "Apakah Anda yakin ingin menghapus mesin ini?",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#3085d6',
+                        confirmButtonText: 'Ya, hapus!',
+                        cancelButtonText: 'Batal'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.submit();
+                        }
+                    });
+                });
+            });
         });
     </script>
 @endpush

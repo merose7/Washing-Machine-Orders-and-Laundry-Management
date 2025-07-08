@@ -27,7 +27,18 @@ class BookingController extends Controller
             return response()->json(['error' => 'Booking not found'], 404);
         }
 
-        $orderId = 'BOOKING-' . $booking->id;
+        // Find the latest payment with order_id starting with BOOKING-{id}-
+        $payment = \App\Models\Payment::where('booking_id', $booking->id)
+            ->where('payment_method', 'midtrans')
+            ->orderByDesc('created_at')
+            ->first();
+
+        if (!$payment) {
+            return response()->json(['error' => 'Payment not found'], 404);
+        }
+
+        // Use stored order_id from payment record
+        $orderId = $payment->order_id;
 
         try {
             /** @var object $status */
@@ -49,12 +60,8 @@ class BookingController extends Controller
                 $booking->payment_status = 'paid';
             } elseif ($transactionStatus == 'pending') {
                 $booking->payment_status = 'pending';
-            } elseif ($transactionStatus == 'deny') {
-                $booking->payment_status = 'deny';
-            } elseif ($transactionStatus == 'expire') {
-                $booking->payment_status = 'expire';
-            } elseif ($transactionStatus == 'cancel') {
-                $booking->payment_status = 'cancel';
+            } elseif (in_array($transactionStatus, ['deny', 'expire', 'cancel'])) {
+                $booking->payment_status = 'unpaid';
             }
 
             // Create or update Payment record when payment is successful
@@ -90,7 +97,7 @@ class BookingController extends Controller
     public function indexAdmin()
     {
         $bookings = \App\Models\Booking::with('machine')->orderBy('booking_time', 'desc')->paginate(10);
-        return view('admin.bookings', compact('bookings'));
+        return view('admin.booking.bookings', compact('bookings'));
     }
 
 

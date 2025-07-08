@@ -4,7 +4,7 @@
 <div class="container mt-4">
     <div class="card shadow-sm">
         <div class="card-header">
-            <h1 class="mb-0">Total Booking</h1>
+            <h1 class="mb-0">Total Pemesanan Mesin Cuci</h1>
         </div>
         <div class="card-body">
 

@@ -45,10 +45,14 @@ class MidtransController extends Controller
         // Extract booking ID from order ID
         $bookingId = null;
 
-        
+        // Updated regex to extract booking ID from order ID including payment_notif_test format
         if (preg_match('/BOOKING-(\d+)-\d+/', $orderId, $matches)) {
             $bookingId = $matches[1];
-        } elseif (preg_match('/payment_notif_test_[^_]+_(\d+)/', $orderId, $matches)) {
+        } elseif (preg_match('/payment_notif_test_[^_]+_(\d+)/i', $orderId, $matches)) {
+            // Extract numeric booking ID from payment_notif_test order ID
+            $bookingId = $matches[1];
+        } elseif (preg_match('/payment_notif_test_[^_]+_([a-z0-9\-]+)/i', $orderId, $matches)) {
+            // Extract alphanumeric UUID-like string as bookingId fallback
             $bookingId = $matches[1];
         } else {
             // Try to extract numeric ID from the order ID string as fallback
@@ -87,12 +91,8 @@ class MidtransController extends Controller
             $booking->payment_status = 'paid';
         } elseif ($transactionStatus == 'pending') {
             $booking->payment_status = 'pending';
-        } elseif ($transactionStatus == 'deny') {
-            $booking->payment_status = 'deny';
-        } elseif ($transactionStatus == 'expire') {
-            $booking->payment_status = 'expire';
-        } elseif ($transactionStatus == 'cancel') {
-            $booking->payment_status = 'cancel';
+        } elseif (in_array($transactionStatus, ['deny', 'expire', 'cancel'])) {
+            $booking->payment_status = 'unpaid';
         }
 
         Log::info('Midtrans callback updating payment_status', ['new_payment_status' => $booking->payment_status]);
