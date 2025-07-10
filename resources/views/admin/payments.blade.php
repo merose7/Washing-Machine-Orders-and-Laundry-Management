@@ -4,7 +4,9 @@
 
 @section('content_header')
     <h1>Detail Pemasukan Laundry The Daily Wash</h1>
-    <p>Tabel Pembayaran Cash dan Midtrans beserta total pemasukan</p>
+    <p>Tabel Pembayaran Cash dan Midtrans beserta total pemasukan</p>    
+    <a href="{{ route('admin.financeReport.exportPdfDetail') }}" class="btn btn-primary">Export to PDF</a>
+
 @stop
 
 @section('content')
@@ -54,9 +56,9 @@
                     <th>ID Pembayaran</th>
                     <th>Mesin ID</th>
                     <th>Nama Customer</th>
-                    <th>Jumlah (Rp)</th>
                     <th>Waktu Booking</th>
                     <th>Status</th>
+                    <th>Jumlah(Rp)</th>
                 </tr>
             </thead>
             <tbody>
@@ -65,7 +67,6 @@
                     <td>{{ $payment->id }}</td>
                     <td>{{ $payment->booking && $payment->booking->machine ? $payment->booking->machine->name : '-' }}</td>
                     <td>{{ $payment->booking ? $payment->booking->customer_name : '-' }}</td>
-                    <td>Rp {{ number_format($payment->amount ?? 0, 0, ',', '.') }}</td>
                     <td>{{ $payment->booking ? $payment->booking->booking_time : '-' }}</td>
                     <td>
                         @php
@@ -81,14 +82,14 @@
                         @endphp
                         <span class="badge {{ $badgeClass }}">{{ ucfirst($status) }}</span>
                     </td>
+                    <td>Rp {{ number_format($payment->amount ?? 0, 0, ',', '.') }}</td>
                 </tr>
                 @endforeach
             </tbody>
             <tfoot>
                 <tr>
-                    <th colspan="3" class="text-end">Total Pembayaran Cash:</th>
+                    <th colspan="5" class="text-end">Total Pembayaran Cash:</th>
                     <th id="totalCashPaymentsFooter">Rp {{ number_format($totalCashPayments ?? 0, 0, ',', '.') }}</th>
-                    <th colspan="2"></th>
                 </tr>
             </tfoot>
         </table>
@@ -108,7 +109,7 @@
                     <th>Nama Customer</th>
                     <th>Waktu Booking</th>
                     <th>Status</th>
-                    <th>Total Pemasukan</th>
+                    <th>Jumlah(Rp)</th>
                 </tr>
             </thead>
             <tbody>
@@ -132,6 +133,7 @@
         </table>
     </div>
 </div>
+
 @stop
 
 @push('scripts')
@@ -148,14 +150,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 previous: "← Previous",
                 next: " Next →"
             },
-            zeroRecords: "Tidak ditemukan data yang cocok",
-            infoEmpty: "Tidak ada data",
+            zeroRecords: "Belum Ada Pembayaran",
+            infoEmpty: "Tidak Ada Pembayaran",
             infoFiltered: "(difilter dari _MAX_ total entri)"
         },
         "footerCallback": function ( row, data, start, end, display ) {
             var api = this.api();
-
-            // Remove the formatting to get integer data for summation
             var intVal = function ( i ) {
                 return typeof i === 'string' ?
                     i.replace(/[\Rp\s\.]/g, '')*1 :
@@ -165,7 +165,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // Total over all pages
             var totalCash = api
-                .column( 3 )
+                .column( 5 )
                 .data()
                 .reduce( function (a, b) {
                     return intVal(a) + intVal(b);
@@ -173,14 +173,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // Total over this page
             var pageTotalCash = api
-                .column( 3, { page: 'current'} )
+                .column( 5, { page: 'current'} )
                 .data()
                 .reduce( function (a, b) {
                     return intVal(a) + intVal(b);
                 }, 0 );
 
             // Update footer
-            $( api.column( 3 ).footer() ).html(
+            $( api.column( 5 ).footer() ).html(
                 'Rp ' + totalCash.toLocaleString('id-ID')
             );
 
@@ -207,8 +207,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 previous: "← Previous",
                 next: " Next →"
             },
-            zeroRecords: "Tidak ditemukan data yang cocok",
-            infoEmpty: "Tidak ada data",
+            zeroRecords: "Belum Ada Pembayaran",
+            infoEmpty: "Tidak Ada Pembayaran",
             infoFiltered: "(difilter dari _MAX_ total entri)"
         },
         "footerCallback": function ( row, data, start, end, display ) {
@@ -246,7 +246,7 @@ document.addEventListener('DOMContentLoaded', function () {
             $('#totalMidtransPayments').text('Rp ' + totalMidtrans.toLocaleString('id-ID'));
 
             // Update totalPayments box by adding cash total dynamically
-            var cashTotal = cashTable ? cashTable.column(3).data().reduce(function(a,b){
+            var cashTotal = cashTable ? cashTable.column(5).data().reduce(function(a,b){
                 return intVal(a) + intVal(b);
             }, 0) : 0;
 

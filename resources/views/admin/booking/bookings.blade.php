@@ -8,7 +8,6 @@
         </div>
         <div class="card-body">
 
-            {{-- Search & Filter Form --}}
             <form method="GET" action="{{ route('admin.bookings') }}" class="row g-3 mb-4 align-items-center">
                 <div class="col-md-5">
                     <input 
@@ -33,7 +32,7 @@
                 </div>
             </form>
 
-            {{-- Booking List --}}
+            {{-- Daftar Booking --}}
             @if($bookings->count())
                 <ul class="list-group">
                     @foreach ($bookings as $booking)

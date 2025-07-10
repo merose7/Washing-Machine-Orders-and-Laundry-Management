@@ -9,59 +9,85 @@
         th, td { border: 1px solid #000; padding: 8px; text-align: center; }
         th { background-color: #f2f2f2; }
         h1, h2, h3 { text-align: center; }
-        .totals { margin-top: 20px; }
-        .totals div { margin-bottom: 5px; font-weight: bold; }
+        .totals { margin-top: 20px; font-weight: bold; }
+        .totals div { margin-bottom: 5px; }
     </style>
 </head>
 <body>
     <h1>Laporan Keuangan</h1>
-    <h3>Monthly Income Summary</h3>
 
+    <h3>Pembayaran Cash</h3>
     <table>
         <thead>
             <tr>
-                <th>Bulan</th>
-                <th>Cash</th>
-                <th>Midtrans</th>
-                <th>Total</th>
+                <th>ID Pembayaran</th>
+                <th>Mesin ID</th>
+                <th>Nama Customer</th>
+                <th>Jumlah (Rp)</th>
             </tr>
         </thead>
         <tbody>
             @php
                 $sumCash = 0;
-                $sumMidtrans = 0;
-                $sumTotal = 0;
             @endphp
-            @foreach ($reportData as $data)
-            @php
-                $sumCash += $data['cash'];
-                $sumMidtrans += $data['midtrans'];
-                $sumTotal += $data['total'];
-            @endphp
-            <tr>
-                <td>{{ $data['month'] }}</td>
-                <td>Rp {{ number_format($data['cash'], 0, ',', '.') }}</td>
-                <td>Rp {{ number_format($data['midtrans'], 0, ',', '.') }}</td>
-                <td>Rp {{ number_format($data['total'], 0, ',', '.') }}</td>
-            </tr>
+            @foreach($cashPayments as $payment)
+                @php
+                    $sumCash += $payment->amount ?? 0;
+                @endphp
+                <tr>
+                    <td>{{ $payment->id }}</td>
+                    <td>{{ $payment->booking && $payment->booking->machine ? $payment->booking->machine->name : '-' }}</td>
+                    <td>{{ $payment->booking ? $payment->booking->customer_name : '-' }}</td>
+                    <td>Rp {{ number_format($payment->amount ?? 0, 0, ',', '.') }}</td>
+                </tr>
             @endforeach
         </tbody>
         <tfoot>
             <tr>
-                <th>Total</th>
+                <th colspan="3" style="text-align:right;">Total Pembayaran Cash:</th>
                 <th>Rp {{ number_format($sumCash, 0, ',', '.') }}</th>
+            </tr>
+        </tfoot>
+    </table>
+
+    <h3>Pembayaran Midtrans</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>ID Transaksi</th>
+                <th>Mesin ID</th>
+                <th>Nama Customer</th>
+                <th>Jumlah (Rp)</th>
+            </tr>
+        </thead>
+        <tbody>
+            @php
+                $sumMidtrans = 0;
+            @endphp
+            @foreach($midtransPayments as $payment)
+                @php
+                    $sumMidtrans += $payment->amount ?? 0;
+                @endphp
+                <tr>
+                    <td>{{ $payment->id }}</td>
+                    <td>{{ $payment->booking && $payment->booking->machine ? $payment->booking->machine->name : '-' }}</td>
+                    <td>{{ $payment->booking ? $payment->booking->customer_name : '-' }}</td>
+                    <td>Rp {{ number_format($payment->amount ?? 0, 0, ',', '.') }}</td>
+                </tr>
+            @endforeach
+        </tbody>
+        <tfoot>
+            <tr>
+                <th colspan="3" style="text-align:right;">Total Pembayaran Midtrans:</th>
                 <th>Rp {{ number_format($sumMidtrans, 0, ',', '.') }}</th>
-                <th>Rp {{ number_format($sumTotal, 0, ',', '.') }}</th>
             </tr>
         </tfoot>
     </table>
 
     <div class="totals">
-        <div>Total Pembayaran Cash: Rp {{ number_format($totalCashPayments ?? 0, 0, ',', '.') }}</div>
-        <div>Total Pembayaran Midtrans: Rp {{ number_format($totalMidtransPayments ?? 0, 0, ',', '.') }}</div>
-        <div>Total Pembayaran: Rp {{ number_format($totalPayments ?? 0, 0, ',', '.') }}</div>
+        <div>Total Pembayaran Cash: Rp {{ number_format($totalCashPayments ?? $sumCash, 0, ',', '.') }}</div>
+        <div>Total Pembayaran Midtrans: Rp {{ number_format($totalMidtransPayments ?? $sumMidtrans, 0, ',', '.') }}</div>
+        <div>Total Pemasukan: Rp {{ number_format($totalPayments ?? ($sumCash + $sumMidtrans), 0, ',', '.') }}</div>
     </div>
-
-    
 </body>
 </html>

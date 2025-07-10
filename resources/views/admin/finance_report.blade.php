@@ -1,3 +1,4 @@
+
 @extends('layouts.admin')
 
 @section('title', 'Dashboard Laporan Keuangan')
@@ -7,20 +8,19 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <div class="container my-5">
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-3 gap-3">
-        <h3>Dashboard Laporan Keuangan</h3>
-        <div class="d-flex flex-column flex-md-row gap-2">
-            <a href="{{ route('admin.financeReport.exportPdf', request()->query()) }}" class="btn btn-primary">Export to PDF</a>
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-3 gap-3">
+            <h3>Dashboard Laporan Keuangan</h3>
+            <div class="d-flex flex-column flex-md-row gap-2">
+                {{-- Removed Export to PDF button as per user request --}}
 
-            {{-- Toggle Chart Type --}}
-            <div class="btn-group" role="group" id="chartTypeGroup">
-                <button type="button" class="btn btn-outline-secondary active" data-type="bar">Bar</button>
-                <button type="button" class="btn btn-outline-secondary" data-type="line">Line</button>
+                {{-- Toggle Chart Type --}}
+                <div class="btn-group" role="group" id="chartTypeGroup">
+                    <button type="button" class="btn btn-outline-secondary active" data-type="bar">Bar</button>
+                    <button type="button" class="btn btn-outline-secondary" data-type="line">Line</button>
+                </div>
             </div>
         </div>
-    </div>
 
-    {{-- Date Filter Form --}}
     <form method="GET" action="{{ route('admin.financeReport') }}" class="mb-4">
         <div class="row g-3 align-items-center">
             <div class="col-auto">
@@ -40,13 +40,7 @@
                 <h5 class="text-muted mb-1">Total Pemasukan</h5>
                 <h2 class="totalPayments">Rp {{ number_format($totalPayments ?? 0, 0, ',', '.') }}</h2>
             </div>
-            <div>
-                <div class="btn-group" role="group" id="viewToggleGroup">
-                    <button type="button" class="btn btn-light" data-view="daily">Hari</button>
-                    <button type="button" class="btn btn-light active" data-view="monthly">Bulan</button>
-                    <button type="button" class="btn btn-light" data-view="yearly" disabled>Tahun</button>
-                </div>
-            </div>
+            
         </div>
         <div style="height: 300px;">
             <canvas id="salesChart" style="width: 100%; height: 100%;"></canvas>
@@ -163,7 +157,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    createChart(monthlyData, 'bar'); // Default chart type
+    createChart(monthlyData, 'bar'); 
 
     const buttons = document.querySelectorAll('#viewToggleGroup button');
     buttons.forEach(button => {

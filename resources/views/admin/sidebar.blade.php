@@ -60,12 +60,12 @@
                 <p>Detail Pemasukan</p>
             </a>
         </li>
-        <li class="nav-item">
+       <!-- <li class="nav-item">
             <a href="{{ url('admin/finance-report') }}" class="nav-link">
                 <i class="nav-icon fas fa-file-invoice-dollar"></i>
                 <p>Laporan Keuangan</p>
             </a>
-        </li>
+        </li> -->
         <li class="nav-item">
             <a href="{{ url('admin/notifications') }}" class="nav-link">
                 <i class="nav-icon fas fa-envelope"></i>

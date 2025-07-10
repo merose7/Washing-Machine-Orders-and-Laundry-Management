@@ -9,7 +9,6 @@
         </div>
         <div class="card-body">
 
-            {{-- Search & Filter Form --}}
             <form method="GET" action="{{ route('admin.notifications.index') }}" class="row g-3 mb-4 align-items-center">
                 <div class="col-md-5">
                     <input 

@@ -9,7 +9,7 @@
         @if(isset($machine)) @method('PUT') @endif
 
         <div class="mb-3">
-            <label for="name">Nama Machine</label>
+            <label for="name">Nama Mesin Cuci</label>
             <input type="text" name="name" value="{{ old('name', $machine->name ?? '') }}" class="form-control" required>
         </div>
 

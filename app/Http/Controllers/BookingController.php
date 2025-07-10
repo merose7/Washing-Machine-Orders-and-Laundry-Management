@@ -276,20 +276,34 @@ public function payment($id)
                 'payment_method' => $paymentMethod,
             ]);
 
-            // Send email notification only if user email is valid
-            $user = Auth::user();
-            if ($user && filter_var($user->email, FILTER_VALIDATE_EMAIL)) {
-                Mail::to($user->email)->send(new BookingConfirmation([
-                    'name' => $booking->customer_name,
-                    'message' => $message,
-                    'booking_time' => $booking->booking_time,
-                    'machine_id' => $booking->machine_id,
-                ]));
-            } else {
-                Log::warning('Invalid or missing user email for booking notification. Booking ID: ' . $booking->id);
-            }
+// Send email notification only if user email is valid
+$user = Auth::user();
+if ($user && filter_var($user->email, FILTER_VALIDATE_EMAIL)) {
+    Mail::to($user->email)->send(new BookingConfirmation([
+        'name' => $booking->customer_name,
+        'message' => $message,
+        'booking_time' => $booking->booking_time,
+        'machine_id' => $booking->machine_id,
+        'payment_method' => $booking->payment_method,
+        'payment_status' => $booking->payment_status,
+    ]));
+} else {
+    Log::warning('Invalid or missing user email for booking notification. Booking ID: ' . $booking->id);
+}
 
-            // TODO: Implement SMS sending if needed
+// Send email notification to admin email for all bookings
+$adminEmail = config('mail.admin_email', 'khofifahdharmasari7@gmail.com');
+if (filter_var($adminEmail, FILTER_VALIDATE_EMAIL)) {
+    Mail::to($adminEmail)->send(new BookingConfirmation([
+        'name' => $booking->customer_name,
+        'message' => $message,
+        'booking_time' => $booking->booking_time,
+        'machine_id' => $booking->machine_id,
+        'payment_method' => $booking->payment_method,
+        'payment_status' => $booking->payment_status,
+    ]));
+}
+
 
         } catch (\Exception $e) {
             Log::error('Failed to send notification: ' . $e->getMessage());

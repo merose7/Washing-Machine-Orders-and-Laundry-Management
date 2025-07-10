@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\FinanceReportExport;
-use App\Exports\FinanceReportDailyExport;
+// Removed import of FinanceReportDailyExport as it does not exist
 use App\Models\Payment;
 
 class PaymentController extends Controller
@@ -44,6 +44,40 @@ class PaymentController extends Controller
         }
 
         return $reportData;
+    }
+
+    public function exportPdfDetail()
+    {
+        $cashPayments = \App\Models\Payment::with(['booking.machine'])
+            ->where('payment_method', 'cash')
+            ->where('status', 'paid')
+            ->get();
+
+        // Override amount to 10000 per payment as in index method
+        $cashPayments->each(function ($payment) {
+            $payment->amount = 10000;
+        });
+
+        // Calculate total cash payments as count * 10000
+        $totalCashPayments = $cashPayments->count() * 10000;
+
+        $midtransPayments = \App\Models\Payment::with(['booking.machine'])
+            ->where('payment_method', 'midtrans')
+            ->whereIn('status', ['paid', 'pending', 'completed'])
+            ->get();
+
+        $totalMidtransPayments = $midtransPayments->sum('amount');
+        $totalPayments = $totalCashPayments + $totalMidtransPayments;
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.finance_report_pdf', compact(
+            'cashPayments',
+            'midtransPayments',
+            'totalCashPayments',
+            'totalMidtransPayments',
+            'totalPayments'
+        ));
+
+        return $pdf->stream('finance_report.pdf');
     }
 
     /**
@@ -154,11 +188,11 @@ class PaymentController extends Controller
         ));
     }
 
-public function createSnapToken(Request $request)
-{
-    LogFacade::info('Entered createSnapToken method with request data: ' . json_encode($request->all()));
+    public function createSnapToken(Request $request)
+    {
+        Log::info('Entered createSnapToken method with request data: ' . json_encode($request->all()));
 
-    try {
+        try {
 $validator = \Validator::make($request->all(), [
     'booking_id' => 'required|integer|exists:bookings,id',
     'email' => 'required|email',
@@ -166,7 +200,7 @@ $validator = \Validator::make($request->all(), [
 ]);
 
 if ($validator->fails()) {
-    LogFacade::error('Validation errors in createSnapToken: ' . json_encode($validator->errors()->all()));
+    Log::error('Validation errors in createSnapToken: ' . json_encode($validator->errors()->all()));
     return response()->json(['error' => 'Validation failed', 'messages' => $validator->errors()->all()], 422);
 }
 
@@ -187,7 +221,7 @@ if ($validator->fails()) {
 
         $grossAmount = $booking->machine && $booking->machine->price > 0 ? $booking->machine->price : 10000;
 
-        LogFacade::info('Midtrans grossAmount: ' . $grossAmount);
+        Log::info('Midtrans grossAmount: ' . $grossAmount);
 
         // Harga Machine 10000 
         if ($grossAmount < 10000) {
@@ -206,7 +240,7 @@ $params = [
     ],
 ];
 
-        LogFacade::info('Midtrans Snap Token Request Params: ' . json_encode($params));
+        Log::info('Midtrans Snap Token Request Params: ' . json_encode($params));
 
         try {
             $snapToken = Snap::getSnapToken($params);
@@ -217,21 +251,21 @@ $params = [
                 ['amount' => $grossAmount, 'status' => 'pending', 'order_id' => $params['transaction_details']['order_id']]
             );
 
-            LogFacade::info('Midtrans Snap Token generated successfully: ' . $snapToken);
+            Log::info('Midtrans Snap Token generated successfully: ' . $snapToken);
             return response()->json(['snap_token' => $snapToken]);
         } catch (\Exception $e) {
-            LogFacade::error('Midtrans Snap Token Connection Error: ' . $e->getMessage());
-            LogFacade::error('Midtrans Snap Token Connection Trace: ' . $e->getTraceAsString());
-            LogFacade::error('Midtrans Snap Token Request Params on Error: ' . json_encode($params));
-            LogFacade::error('Midtrans Snap Token Full Exception: ' . $e);
-            LogFacade::error('Midtrans Snap Token Exception Class: ' . get_class($e));
-            LogFacade::error('Midtrans Snap Token Exception File: ' . $e->getFile());
-            LogFacade::error('Midtrans Snap Token Exception Line: ' . $e->getLine());
+            Log::error('Midtrans Snap Token Connection Error: ' . $e->getMessage());
+            Log::error('Midtrans Snap Token Connection Trace: ' . $e->getTraceAsString());
+            Log::error('Midtrans Snap Token Request Params on Error: ' . json_encode($params));
+            Log::error('Midtrans Snap Token Full Exception: ' . $e);
+            Log::error('Midtrans Snap Token Exception Class: ' . get_class($e));
+            Log::error('Midtrans Snap Token Exception File: ' . $e->getFile());
+            Log::error('Midtrans Snap Token Exception Line: ' . $e->getLine());
             return response()->json(['error' => 'Failed to generate snap token due to connection error', 'message' => $e->getMessage()], 500);
         }
     } catch (\Exception $e) {
-        LogFacade::error('Midtrans Snap Token Error: ' . $e->getMessage());
-        LogFacade::error('Midtrans Snap Token Trace: ' . $e->getTraceAsString());
+        Log::error('Midtrans Snap Token Error: ' . $e->getMessage());
+        Log::error('Midtrans Snap Token Trace: ' . $e->getTraceAsString());
         return response()->json(['error' => 'Failed to generate snap token', 'message' => $e->getMessage()], 500);
     }
 }
@@ -404,7 +438,6 @@ public function financeReport(Request $request)
 
         $midtransResults = $midtransQuery->get();
 
-        // Transform results to structure: [day => cash_total or midtrans_total]
         $cashData = [];
         foreach ($cashResults as $row) {
             $day = $row->day;
@@ -613,7 +646,8 @@ public function exportPdf()
             return redirect()->back()->withErrors(['month' => 'Please select a month']);
         }
 
-        return Excel::download(new \App\Exports\FinanceReportDailyExport($selectedMonth), "finance_report_daily_{$selectedMonth}.xlsx");
+        // Removed usage of FinanceReportDailyExport as it does not exist
+        abort(501, 'FinanceReportDailyExport not implemented');
     }
 
     private function getFinanceReportData()
@@ -651,7 +685,7 @@ public function exportPdf()
 
     public function handleWebhook(Request $request)
     {
-        LogFacade::info('Midtrans webhook received: ' . $request->getContent());
+        Log::info('Midtrans webhook received: ' . $request->getContent());
 
         // Set Midtrans configuration
         Config::$serverKey = config('midtrans.server_key');
@@ -671,7 +705,7 @@ public function exportPdf()
         $fraudStatus = $notification->fraud_status ?? null;
 
         if (!$orderId || !$statusCode || !$grossAmount || !$signatureKey) {
-            LogFacade::warning('Midtrans webhook missing required fields');
+            Log::warning('Midtrans webhook missing required fields');
             return response('Bad Request', 400);
         }
 
@@ -680,7 +714,7 @@ public function exportPdf()
         $expectedSignature = hash('sha512', $input);
 
         if ($signatureKey !== $expectedSignature) {
-            LogFacade::warning('Midtrans webhook invalid signature');
+            Log::warning('Midtrans webhook invalid signature');
             return response('Invalid signature', 403);
         }
 
@@ -695,7 +729,7 @@ public function exportPdf()
         }
 
         if (!$bookingId) {
-            LogFacade::warning('Midtrans webhook invalid order_id format: ' . $orderId);
+            Log::warning('Midtrans webhook invalid order_id format: ' . $orderId);
             return response('Invalid order_id', 400);
         }
 
@@ -705,11 +739,11 @@ public function exportPdf()
             ->first();
 
         if (!$payment) {
-            LogFacade::warning('Midtrans webhook payment not found for booking_id: ' . $bookingId);
+            Log::warning('Midtrans webhook payment not found for booking_id: ' . $bookingId);
             return response('Payment not found', 404);
         }
 
-        LogFacade::info("Midtrans webhook transaction_status: {$transactionStatus}, current payment status: {$payment->status}");
+        Log::info("Midtrans webhook transaction_status: {$transactionStatus}, current payment status: {$payment->status}");
 
         // Map Midtrans transaction status to local payment status
         $statusMap = [
@@ -724,11 +758,11 @@ public function exportPdf()
         $newStatus = $statusMap[$transactionStatus] ?? 'unpaid';
 
         if ($payment->status !== $newStatus) {
-            LogFacade::info("Updating payment status from {$payment->status} to {$newStatus} for booking_id {$bookingId}");
+            Log::info("Updating payment status from {$payment->status} to {$newStatus} for booking_id {$bookingId}");
             $payment->status = $newStatus;
             $payment->save();
 
-            LogFacade::info("Midtrans payment status updated for booking_id {$bookingId} to {$newStatus}");
+            Log::info("Midtrans payment status updated for booking_id {$bookingId} to {$newStatus}");
 
             $booking = $payment->booking;
             if ($booking) {
@@ -745,8 +779,11 @@ public function exportPdf()
                 }
             }
         } else {
-            LogFacade::info("Payment status for booking_id {$bookingId} is already {$payment->status}, no update needed.");
+            Log::info("Payment status for booking_id {$bookingId} is already {$payment->status}, no update needed.");
         }
+
+        // Additional debug logs for webhook processing
+        Log::debug('Webhook processing completed for booking_id: ' . $bookingId . ', new status: ' . $newStatus);
 
         return response('OK', 200);
     }

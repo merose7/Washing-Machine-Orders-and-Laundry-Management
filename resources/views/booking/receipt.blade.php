@@ -45,11 +45,6 @@
                 Cetak Struk
             </button>
 
-            <!-- Cek Status -->
-            <button id="check-status-button" class="bg-blue-600 hover:bg-blue-700 text-black px-4 py-2 rounded shadow">
-                Check Status
-            </button>
-
             <!-- Konfirmasi -->
             <form method="POST" action="{{ route('booking.confirmReceipt', $booking->id) }}">
                 @csrf

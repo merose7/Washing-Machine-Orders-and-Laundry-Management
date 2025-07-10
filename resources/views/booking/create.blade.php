@@ -8,7 +8,7 @@
 
 @section('content')
 <div class="container mt-5 mb-5">
-    <h2 class="text-center mb-4">Booking Mesin Cuci</h2>
+    <h2 class="text-center mb-4">Pemesanan Mesin Cuci</h2>
 
     <form action="/booking" method="POST" class="p-4 shadow rounded bg-white">
         @csrf
@@ -27,11 +27,11 @@
 
         <div class="row">
             <div class="col-md-6 mb-3">
-            <label for="booking_date" class="form-label">Tanggal Booking</label>
+            <label for="booking_date" class="form-label">Tanggal</label>
             <input type="date" class="form-control" id="booking_date" name="booking_date" required>
         </div>
         <div class="col-md-6 mb-3">
-            <label for="booking_time" class="form-label">Waktu Booking</label>
+            <label for="booking_time" class="form-label">Waktu</label>
             <input type="time" class="form-control" id="booking_time" name="booking_time" required>
         </div>
 </div>
@@ -85,7 +85,7 @@ document.addEventListener('DOMContentLoaded', function () {
             </select>
         </div>
 
-        <button type="submit" class="btn btn-danger w-100">Booking Sekarang</button>
+        <button type="submit" class="btn btn-danger w-100">Pesan Sekarang</button>
         <div class="text-center mt-3">
         <a href="{{ route('customer.dashboard') }}" class="btn btn-secondary">
         Kembali

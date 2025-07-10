@@ -91,15 +91,20 @@ Route::middleware(['auth'])->group(function () {
 });
 
 Route::post('/midtrans/webhook', [PaymentController::class, 'handleWebhook']);
-Route::get('/ad min/payments', [PaymentController::class, 'index'])->name('admin.payments'); 
+Route::get('/admin/payments', [PaymentController::class, 'index'])->name('admin.payments'); 
 
 Route::get('/admin/finance-report', [PaymentController::class, 'financeReport'])->name('admin.financeReport');
+
 Route::get('/admin/finance-report/export-pdf', [PaymentController::class, 'exportPdf'])->name('admin.financeReport.exportPdf');
 Route::get('/admin/finance-report/export-excel', [PaymentController::class, 'exportExcel'])->name('admin.financeReport.exportExcel');
-Route::get('/admin/finance-report/daily', [PaymentController::class, 'financeReportDaily'])->name('admin.financeReport.daily');
 Route::get('/admin/finance-report/daily/export-pdf', [PaymentController::class, 'exportPdfDaily'])->name('admin.financeReport.exportPdfDaily');
 Route::get('/admin/finance-report/daily/export-excel', [PaymentController::class, 'exportExcelDaily'])->name('admin.financeReport.exportExcelDaily');
-Route::get('/admin/payments/totals', [\App\Http\Controllers\PaymentController::class, 'getTotals'])->name('admin.payments.totals');
+
+Route::get('/admin/payments/export-pdf', [PaymentController::class, 'exportPdfDetail'])->name('admin.payments.exportPdf');
+Route::get('/admin/finance-report/export-detail-pdf', [PaymentController::class, 'exportPdfDetail'])->name('admin.financeReport.exportPdfDetail');
+
+Route::get('/admin/finance-report/daily', [PaymentController::class, 'financeReportDaily'])->name('admin.financeReport.daily');
+Route::get('/admin/payments/totals', [PaymentController::class, 'getTotals'])->name('admin.payments.totals');
 Route::get('/admin/payments/midtrans', [\App\Http\Controllers\PaymentController::class, 'getMidtransPayments'])->name('admin.payments.midtrans');
 Route::get('/admin/bookings', [BookingController::class, 'indexAdmin'])->name('admin.bookings');
 Route::get('/receipt/{id}', [BookingController::class, 'showReceipt'])->name('receipt.show');
