@@ -40,35 +40,71 @@
 document.addEventListener('DOMContentLoaded', function () {
     const dateInput = document.getElementById('booking_date');
     const timeInput = document.getElementById('booking_time');
-    const now = new Date();
+    const form = document.getElementById('bookingForm');
 
     // Helper padding function
     const pad = (n) => n.toString().padStart(2, '0');
 
     // Set minimum and maximum date to today to disable future dates
+    const now = new Date();
     const todayStr = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
     dateInput.min = todayStr;
     dateInput.max = todayStr;
 
-    // Update time input min/max based on selected date
     const updateTimeLimits = () => {
+        const now = new Date();
         const selectedDate = new Date(dateInput.value);
         const isToday = selectedDate.toDateString() === now.toDateString();
 
         if (isToday) {
-            // If today, restrict time from current time to 23:59
             const minTime = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
             timeInput.min = minTime;
-            timeInput.max = '23:59';
+            timeInput.max = '22:00';
+
+            if (minTime > '22:00') {
+                timeInput.disabled = true;
+            } else {
+                timeInput.disabled = false;
+            }
         } else {
-            // No other date possible, but fallback to full day
-            timeInput.min = '00:00';
-            timeInput.max = '23:59';
+            timeInput.min = '07:00';
+            timeInput.max = '22:00';
+            timeInput.disabled = false;
         }
     };
 
     dateInput.addEventListener('change', updateTimeLimits);
-    
+
+    // Validate time on input to prevent selecting past time if date is today
+    timeInput.addEventListener('input', () => {
+        const now = new Date();
+        const selectedDate = new Date(dateInput.value);
+        const isToday = selectedDate.toDateString() === now.toDateString();
+
+        if (isToday) {
+            const [hours, minutes] = timeInput.value.split(':').map(Number);
+            if (hours < now.getHours() || (hours === now.getHours() && minutes < now.getMinutes())) {
+                timeInput.value = timeInput.min;
+            }
+        }
+    });
+
+    // Validate on form submit
+    form.addEventListener('submit', (e) => {
+        const now = new Date();
+        const selectedDate = new Date(dateInput.value);
+        const isToday = selectedDate.toDateString() === now.toDateString();
+
+        if (isToday) {
+            const [hours, minutes] = timeInput.value.split(':').map(Number);
+            if (hours < now.getHours() || (hours === now.getHours() && minutes < now.getMinutes())) {
+                e.preventDefault();
+                alert('Waktu yang dipilih sudah lewat. Silakan pilih waktu yang valid.');
+                timeInput.focus();
+            }
+        }
+    });
+
     // Initialize time limit on load if date is pre-filled
     if (dateInput.value) {
         updateTimeLimits();

@@ -120,7 +120,7 @@
                     <td>{{ $payment->booking ? $payment->booking->customer_name : '-' }}</td>
                     <td>{{ $payment->booking ? $payment->booking->booking_time : '-' }}</td>
                     <td>{{ $payment->booking ? ucfirst($payment->booking->status) : '-' }}</td>
-                    <td>Rp {{ number_format($payment->amount ?? 0, 0, ',', '.') }}</td>
+                    <td>Rp {{ number_format(($payment->amount && $payment->amount > 0) ? $payment->amount : 10000, 0, ',', '.') }}</td>
                 </tr>
                 @endforeach
             </tbody>

@@ -65,15 +65,16 @@
                 $sumMidtrans = 0;
             @endphp
             @foreach($midtransPayments as $payment)
-                @php
-                    $sumMidtrans += $payment->amount ?? 0;
-                @endphp
-                <tr>
-                    <td>{{ $payment->id }}</td>
-                    <td>{{ $payment->booking && $payment->booking->machine ? $payment->booking->machine->name : '-' }}</td>
-                    <td>{{ $payment->booking ? $payment->booking->customer_name : '-' }}</td>
-                    <td>Rp {{ number_format($payment->amount ?? 0, 0, ',', '.') }}</td>
-                </tr>
+            @php
+                $amount = ($payment->amount && $payment->amount > 0) ? $payment->amount : 10000;
+                $sumMidtrans += $amount;
+            @endphp
+            <tr>
+                <td>{{ $payment->id }}</td>
+                <td>{{ $payment->booking && $payment->booking->machine ? $payment->booking->machine->name : '-' }}</td>
+                <td>{{ $payment->booking ? $payment->booking->customer_name : '-' }}</td>
+                <td>Rp {{ number_format($amount, 0, ',', '.') }}</td>
+            </tr>
             @endforeach
         </tbody>
         <tfoot>
