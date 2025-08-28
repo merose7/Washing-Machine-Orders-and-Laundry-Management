@@ -32,10 +32,9 @@
 ---
 
 ## 📸 Screenshots
-(Tambahkan gambar biar lebih menarik, contoh:)
 
 ![Booking Page](assets/Page.png)  
-![Admin Dashboard](public/images/Page.png)
+![Admin Dashboard](public/images/DashboardAdmin.png)
 
 ---
 
