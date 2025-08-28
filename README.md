@@ -33,8 +33,12 @@
 
 ## 📸 Screenshots
 
-![Booking Page](public\images\Page.png)  
-![Admin Dashboard](public\images\DashboardAdmin.png)
+### Halaman Booking
+![Booking Page](assets/booking-page.png)
+
+### Dashboard Admin
+![Dashboard Admin](assets/admin-dashboard.png)
+
 
 ---
 
