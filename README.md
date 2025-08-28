@@ -34,11 +34,9 @@ public/images/Screenshot 2025-08-28 082722.png
 ## 📸 Screenshots
 
 ### Halaman Booking
-![Booking Page](https://raw.githubusercontent.com/merose7/-washing-machine-orders-and-laundry-management./main/public/images/Page.png)
-
+![Screenshot 1](https://raw.githubusercontent.com/username/thedailywash/main/public/images/Screenshot%202025-08-28%20082807.png)
 ### Dashboard Admin
-![Dashboard Admin](assets/admin-dashboard.png)
-
+![Screenshot 2](https://raw.githubusercontent.com/username/thedailywash/main/public/images/Screenshot%202025-08-28%20082722.png)
 
 ---
 
