@@ -30,11 +30,11 @@
 - **Payment Gateway:** Midtrans  
 
 ---
-
+public/images/Screenshot 2025-08-28 082722.png
 ## 📸 Screenshots
 
 ### Halaman Booking
-![Booking Page](assets/booking-page.png)
+![Booking Page](https://raw.githubusercontent.com/merose7/-washing-machine-orders-and-laundry-management./main/public/images/Page.png)
 
 ### Dashboard Admin
 ![Dashboard Admin](assets/admin-dashboard.png)
