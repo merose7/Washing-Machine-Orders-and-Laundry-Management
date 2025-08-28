@@ -34,8 +34,8 @@
 ## 📸 Screenshots
 (Tambahkan gambar biar lebih menarik, contoh:)
 
-![Booking Page](assets/Page.png)  
-![Admin Dashboard](assets/Dashboardadmin.png)
+![Booking Page](images\Page.png)  
+![Admin Dashboard](Images/Dashboardadmin.png)
 
 ---
 
