@@ -35,7 +35,7 @@
 (Tambahkan gambar biar lebih menarik, contoh:)
 
 ![Booking Page](assets/Page.png)  
-![Admin Dashboard](assets/Dashboardadmin.png)
+![Admin Dashboard](public/images/Page.png)
 
 ---
 
