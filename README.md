@@ -33,7 +33,7 @@
 
 ## 📸 Screenshots
 
-![Booking Page](images\Page.png)  
+![Booking Page](public\images\Page.png)  
 ![Admin Dashboard](Images/Dashboardadmin.png)
 
 ---
