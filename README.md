@@ -33,10 +33,8 @@
 public/images/Screenshot 2025-08-28 082722.png
 ## 📸 Screenshots
 
-### Halaman Booking
-![Screenshot 1](https://raw.githubusercontent.com/username/thedailywash/main/public/images/Screenshot%202025-08-28%20082807.png)
-### Dashboard Admin
-![Screenshot 2](https://raw.githubusercontent.com/username/thedailywash/main/public/images/Screenshot%202025-08-28%20082722.png)
+![Booking Page](assets/Page.png)  
+![Admin Dashboard](public/images/DashboardAdmin.png)
 
 ---
 
