@@ -26,15 +26,8 @@
 - **Framework:** Laravel  
 - **Frontend:** Bootstrap, JavaScript  
 - **Database:** MySQL  
-- **Payment Gateway:** Midtrans  
-
----
-
-## 📸 Screenshots
-
-![Booking Page](public/images/Screenshot 2025-08-28 082722.png)
-![Admin Dashboard](public/images/DashboardAdmin.png)
-
+- **Payment Gateway:** Midtrans
+  
 ---
 
 ## 📂 How to Install
