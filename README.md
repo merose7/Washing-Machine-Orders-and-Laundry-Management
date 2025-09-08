@@ -30,9 +30,11 @@
   
 ---
 
-## Screenshoot Project
+## Home Page 
 ![Home Page](public/images/BookingListMC.png)
-![Home Page](public/images/DashboardAdmin.png) 
+
+## Admin Dashboard
+![Dashboard Admin](public/images/DashboardAdmin.png) 
 
 ---
 
