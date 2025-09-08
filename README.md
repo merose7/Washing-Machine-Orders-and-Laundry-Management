@@ -1,25 +1,24 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo">
+ <img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo">
 </p>
 
 <h1 align="center">🧺 Washing Machine Orders & Laundry Management System</h1>
 
 <p align="center">
-  Sistem booking mesin cuci dan manajemen laundry berbasis website dengan Laravel.  
-  Dibuat untuk mempermudah pelanggan dalam melakukan pemesanan mesin cuci serta membantu admin dalam mengelola layanan laundry koin.
+ Web-based washing machine booking and laundry management system with Laravel.Made to facilitate customers in booking washing machines and help admins in managing coin laundry services.
 </p>
 
 ---
 
-## 🚀 Fitur Utama
+## 🚀 Key Features
 - Multi-auth (Admin & Customer)
-- Booking mesin cuci online
-- Integrasi pembayaran **Midtrans**
-- Notifikasi email pengingat booking
-- Dashboard admin:  
-  - CRUD mesin cuci  
-  - Laporan keuangan (export PDF)  
-  - Manajemen pembayaran pelanggan  
+- Online washing machine booking
+- **Midtrans** payment integration
+- Booking reminder email notification
+- Admin dashboard:  
+  - CRUD washing machine  
+  - Financial report (PDF export)  
+  - Customer payment management  
 
 ---
 
@@ -30,53 +29,53 @@
 - **Payment Gateway:** Midtrans  
 
 ---
-public/images/Screenshot 2025-08-28 082722.png
+
 ## 📸 Screenshots
 
-![Booking Page](assets/Page.png)  
+![Booking Page](assets/Page.png) 
 ![Admin Dashboard](public/images/DashboardAdmin.png)
 
 ---
 
-## 📂 Cara Install
-1. Clone repo ini
+## 📂 How to Install
+1. Clone repo init
    ```bash
-   git clone https://github.com/username/washing-machine-orders-and-laundry-management.git 
-2. Masuk ke folder project
+   git remote add origin https://github.com/merose7/Thesis-Project.git
+2. Enter the project folder
    ```bash'''bash'''
-   cd washing-machine-orders-and-laundry-management
+   cd Thesis-Project
 4. Install Dependency
    ```bash
    composer install
    npm install
-6. buat file .env dan sesuaikan konfigurasi database & Midtrans
-7. Migrasi database
+6. create .env file and customize database & Midtrans configuration
+7. Migrate database
    ```bash
    php artisan migrate --seed
-9. jalankan server
+9. run the server
     ```bash
    php artisan serve
 
 ---
 
-## 📖Tentang Project 
-Project ini merupakan bagian dari Tugas Akhir dengan judul:
-"Sistem Booking Mesin Laundry Koin dengan Metode Personal Extreme Programming (Studi Kasus The Daily Wash Ketintang)".
-Sistem ini diharapkan dapat:
-- Meningkatkan efisiensi pengelolaan laundry berbasis koin.
-- Memudahkan pelanggan melakukan booking mesin dari mana saja.
-- Memberikan transparansi pembayaran & laporan bagi admin.
+## 📖About Project 
+This project is part of the Final Project with the title:
+"Coin Laundry Machine Booking System with Personal Extreme Programming Method (Case Study The Daily Wash Ketintang)".
+This system is expected to:
+- Improve the efficiency of coin-based laundry management.
+- Make it easy for customers to book machines from anywhere.
+- Provide transparency of payments & reports for the admin.
 
 ---
 
 👩‍💻 Author
 
-Ririn – Full Stack Developer
-    Kontak: [Linkedln](https://www.linkedin.com/in/khofifahdharmasari/) 
-            Email khofifahdharmasari7@gmail.com 
+Ririn - Full Stack Developer
+ Contact: [Linkedln](https://www.linkedin.com/in/khofifahdharmasari/) 
+ Email khofifahdharmasari7@gmail.com 
 
 ---
 
 📜 License
 
-Project ini open-source di bawah lisensi [MIT](https://opensource.org/license/MIT?utm_source=chatgpt.com).
+Project ini open-source di bawah lisensi [MIT](https://mit-license.org/)
