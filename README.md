@@ -32,7 +32,7 @@
 
 ## 📸 Screenshots
 
-![Booking Page](assets/Page.png) 
+![Booking Page](public/images/Screenshot 2025-08-28 082722.png)
 ![Admin Dashboard](public/images/DashboardAdmin.png)
 
 ---
