@@ -31,7 +31,7 @@
 ---
 
 ## Screenshoot Project
-![Home Page](https://github.com/public/images/BookingListMC.png)
+![Home Page](public/images/BookingListMC.png)
 ![alt text](https://github.com/[merose7]/[reponame]/blob/[master]/image.jpg?raw=true)
 
 ---
